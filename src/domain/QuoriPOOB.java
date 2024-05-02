@@ -1,7 +1,9 @@
 package domain;
 
 import java.util.Map;
-
+/**
+ * prueba
+ */
 public class QuoriPOOB {
     private int size = 9;
     private int[][] tablero;
