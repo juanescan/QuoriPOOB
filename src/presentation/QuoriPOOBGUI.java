@@ -1,6 +1,8 @@
 package presentation;
 
+import domain.*;
 import javax.swing.*;
+
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 
@@ -32,32 +34,60 @@ public class QuoriPOOBGUI extends JFrame{
     private JButton[][] casillas;
     private JTextField movs;
     private JTextField sucessToken;
-    private Color gris = new Color(238,238,238);
-
+    private JPanel initialScreen;
+    private JButton inicio;
+    private JButton salirB;
     private JPanel main;
+    private QuoriPOOB game;
+    private int[][] tablero;
 
     public QuoriPOOBGUI(){
 
         prepareElements();
-        prepareElementsBoard();
+        prepareInitialScreen();
         prepareElementsMenu();
         prepareActions();
 
+
+    }
+    
+    
+    private void prepareInitialScreen(){
+        initialScreen = new JPanel();
+        initialScreen.setLayout(new BoxLayout(initialScreen, BoxLayout.Y_AXIS));
+        initialScreen.setBackground(Color.ORANGE);
+
+        JLabel texto = new JLabel("QuoriPOOB");
+        texto.setAlignmentX(Component.CENTER_ALIGNMENT);
+        Font font = new Font("Arial", Font.BOLD, 24);
+        texto.setFont(font);
+        initialScreen.add(texto);
+        initialScreen.add(Box.createVerticalStrut(100));
+
+        inicio = new JButton("Inicio");
+        inicio.setAlignmentX(Component.CENTER_ALIGNMENT);
+        initialScreen.add(inicio);
+        initialScreen.add(Box.createVerticalStrut(40));
+
+        salirB = new JButton("Salir");
+        salirB.setAlignmentX(Component.CENTER_ALIGNMENT);
+        initialScreen.add(salirB);
+        add(initialScreen);
+        setLocationRelativeTo(null);
 
     }
 
 
 
     private void prepareElements(){
-
         setTitle("QuoriPOOBGUI");
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        // Nueva posicion de la pantalla
-        setLocationRelativeTo(null);
+        int size = 600;
+        setSize(size, size);
+        setLocationRelativeTo(null); 
         fileChooser = new JFileChooser();
         fileChooser.setVisible(false);
-
     }
+
 
 
     private void prepareElementsMenu(){
@@ -87,6 +117,7 @@ public class QuoriPOOBGUI extends JFrame{
         jugador2(main);
         //llama al metodo para los botones del los movimientos del tablero
         add(main);
+        prepareActionsBoard();
     }
 
     private void prepareActions(){
@@ -115,7 +146,17 @@ public class QuoriPOOBGUI extends JFrame{
         });
 
 
-
+        inicio.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent ev) {
+        		actionNew();
+        	}
+        });
+        
+        salirB.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent ev) {
+        		actionClose();
+        	}
+        });
 
 
 
@@ -147,6 +188,35 @@ public class QuoriPOOBGUI extends JFrame{
         if (selection == JFileChooser.APPROVE_OPTION) {
             File fichero = fileChooser.getSelectedFile();
             JOptionPane.showMessageDialog(this, "the file " + fichero.getName() + " can not be saved because the functionalities are under construction");
+        }
+    }
+    
+    private void actionNew() {
+    	game = new QuoriPOOB();
+        tablero = game.getTablero();
+        prepareElementsBoard();
+        remove(initialScreen);
+        revalidate();
+        repaint();
+    }
+    
+    private void prepareActionsBoard(){
+        for(int i = 0; i < 17; i++){
+            for(int j = 0; j < 17; j++){
+                final JButton currentButton = casillas[i][j];
+                final int x = i; 
+                final int y = j; 
+                currentButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent ev){
+                        if(x % 2 != 0 || y % 2 != 0) {
+                            actionWall(currentButton);
+                        }
+                        else {
+                            actionCell(currentButton);
+                        }
+                    }
+                });
+            }
         }
     }
 
@@ -187,18 +257,42 @@ public class QuoriPOOBGUI extends JFrame{
 
     private void tableroPanel(JPanel mainPanel){
         JPanel boardPanel = new JPanel();
-        boardPanel.setLayout(new GridLayout(9,9));
-        casillas = new JButton[9][9];
-        int casillaSize = 50;
-        for(int i = 0; i < 9; i++){
-            for(int j = 0; j < 9; j++){
+        boardPanel.setLayout(new GridLayout(17,17));
+        casillas = new JButton[17][17];
+        int casillaSize = 20;
+        for(int i = 0; i < 17; i++){
+            for(int j = 0; j < 17; j++){
                 JButton casilla = new JButton();
-                casilla.setPreferredSize(new Dimension(casillaSize, casillaSize));
+                if(i % 2 != 0 || j % 2 != 0) {
+                	casilla.setBackground(Color.lightGray);
+                }else {
+                	casilla.setBackground(Color.white);
+                }
+                casilla.putClientProperty("fila", i);
+                casilla.putClientProperty("columna", j);
                 casillas[i][j] = casilla;
                 boardPanel.add(casilla);
             }
         }
+        paintFichas();
         mainPanel.add(boardPanel, BorderLayout.CENTER);
+    }
+    
+    private void paintFichas() {
+        for(int i = 0; i < 17; i++){
+            for(int j = 0; j < 17; j++){
+                if (tablero[i][j] == 1){
+                    Token t = game.getToken(i,j);
+                    Color c = t.getColor();
+                    casillas[i][j].setBackground(c); 
+                }else if(tablero[i][j] == 0) {
+                	casillas[i][j].setBackground(Color.white);
+                }
+                	
+            }
+        }
+        revalidate();
+        repaint();
     }
 
     private void jugador2(JPanel mainPanel) {
@@ -230,9 +324,19 @@ public class QuoriPOOBGUI extends JFrame{
         mainPanel.add(jugador1Panel, BorderLayout.WEST);
     }
 
-
-
-
+    private void actionCell(JButton button) {
+        int fila = (int)button.getClientProperty("fila");
+        int columna = (int)button.getClientProperty("columna");
+        game.move(fila, columna); 
+        paintFichas();
+    }
+    
+    private void actionWall(JButton button) {
+    	
+    }
+    
+    
+    
 
     public static void main(String[] args){
         JFrame frame = new QuoriPOOBGUI();
