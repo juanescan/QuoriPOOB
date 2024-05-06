@@ -3,6 +3,8 @@ package domain;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.swing.JOptionPane;
 /**
  * prueba
  */
@@ -15,6 +17,7 @@ public class QuoriPOOB {
     private Player currentPlayer;
     private Token t1;
     private Token t2;
+
 
 
   
@@ -65,7 +68,12 @@ public class QuoriPOOB {
     	}
     }
     
-    private void verificarVictoria() {
+    public void verificarVictoria() {
+    	Token t = currentPlayer.getToken();
+    	int fila = t.getFila();
+    	if(currentPlayer == player1 && fila == 16 || currentPlayer == player2 && fila == 0) {
+    		JOptionPane.showMessageDialog(null, "El jugador " + currentPlayer.getName() + " ha ganado el juego");
+    	}
     	
     }
     
@@ -73,13 +81,42 @@ public class QuoriPOOB {
     public void move(int xPos, int yPos) {
     	Token t = getCurrentPlayer().getToken();
     	t.move(xPos, yPos);
-    }
+    } 	
     
     public void setElemento(int fila, int columna, int valor){
         tablero[fila][columna] = valor;
     }
     
-    public void putWall(boolean direction,int xPos, int yPos) {
+    public void putWall(boolean horizontal,int xPos, int yPos) {
+    	if(currentPlayer.getNWalls() > 0) {
+    		if(horizontal) {
+        		if(yPos < 14) {
+        			Wall w = new Wall(true,xPos,xPos+2,yPos,yPos);
+        			tablero[xPos][yPos] = 3;
+        			tablero[xPos][yPos+1] = 3;
+        			tablero[xPos][yPos+2] = 3;
+        		}else if(yPos > 14) {
+        			Wall w = new Wall(true,xPos,xPos-2,yPos,yPos);
+        			tablero[xPos][yPos] = 3;
+        			tablero[xPos][yPos-1] = 3;
+        			tablero[xPos][yPos-2] = 3;
+        		}
+        	}else if(!horizontal) {
+        		if(xPos < 14) {
+        			Wall w = new Wall(false,xPos,xPos,yPos,yPos+2);
+        			tablero[xPos][yPos] = 3;
+        			tablero[xPos+1][yPos] = 3;
+        			tablero[xPos+2][yPos] = 3;
+        		}else if( xPos > 14) {
+        			Wall w = new Wall(false,xPos,xPos,yPos,yPos-2);
+        			tablero[xPos][yPos] = 3;
+        			tablero[xPos-1][yPos] = 3;
+        			tablero[xPos-2][yPos] = 3;
+        		}
+        	}
+        	currentPlayer.minusNWalls();
+        	cambiaTurno();
+    	}
     	
     }
     

@@ -1,27 +1,38 @@
 package domain;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Player {
 	private String name;
-	private int walls;
+	private int nWalls;
 	private Token token;
+
 	
-	public Player(String name,Token token, int walls) {
+	public Player(String name,Token token, int nWalls) {
 		this.name = name;
 		this.token = token;
-		this.walls = walls;
+		this.nWalls = nWalls;
+		
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public int getWalls() {
-		return walls;
+	public int getNWalls() {
+		return nWalls;
 	}
 
 	public Token getToken() {
 		return token;
 	}
+	
+	public void minusNWalls() {
+		nWalls--;
+	}
+
+
 
 
 }

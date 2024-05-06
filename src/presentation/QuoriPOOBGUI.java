@@ -152,6 +152,12 @@ public class QuoriPOOBGUI extends JFrame{
         	}
         });
         
+        nuevo.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent ev) {
+        		resetGame();
+        	}
+        });
+        
         salirB.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent ev) {
         		actionClose();
@@ -263,9 +269,12 @@ public class QuoriPOOBGUI extends JFrame{
         for(int i = 0; i < 17; i++){
             for(int j = 0; j < 17; j++){
                 JButton casilla = new JButton();
-                if(i % 2 != 0 || j % 2 != 0) {
+                if(i % 2 != 0 && j % 2 != 0) {
+                	casilla.setBackground(Color.black);
+                }else if(i % 2 != 0 || j % 2 != 0) {
                 	casilla.setBackground(Color.lightGray);
-                }else {
+                }
+                else {
                 	casilla.setBackground(Color.white);
                 }
                 casilla.putClientProperty("fila", i);
@@ -332,11 +341,40 @@ public class QuoriPOOBGUI extends JFrame{
     }
     
     private void actionWall(JButton button) {
-    	
+    	int fila = (int)button.getClientProperty("fila");
+        int columna = (int)button.getClientProperty("columna");
+        if(fila % 2 != 0 && columna % 2 != 0) {
+        	JOptionPane.showMessageDialog(null,"En este sitio no se puede poner una pared");
+        }else if(fila % 2 != 0) {
+        	game.putWall(true, fila, columna);
+        }else if(columna % 2 != 0) {
+        	game.putWall(false, fila, columna);
+        }
+        paintWall();
     }
     
     
+    private void resetGame() {
+    	if(game != null) {
+    		remove(main);
+    	}
+    	game = new QuoriPOOB();
+        tablero = game.getTablero();
+        prepareElementsBoard();
+        remove(initialScreen);
+        revalidate();
+        repaint();
+    }
     
+    private void paintWall() {
+    	for(int i = 0; i < 17; i++) {
+    		for(int j = 0; j < 17; j++) {
+    			if(tablero[i][j] == 3) {
+    				casillas[i][j].setBackground(Color.GREEN);
+    			}
+    		}
+    	}
+    }
 
     public static void main(String[] args){
         JFrame frame = new QuoriPOOBGUI();

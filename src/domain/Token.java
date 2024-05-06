@@ -37,15 +37,18 @@ public class Token {
     public void move(int xPos, int yPos) {
         int distanciaFila = Math.abs(fila - xPos);
         int distanciaColumna = Math.abs(columna - yPos);
-        if (distanciaFila > 2 || distanciaColumna > 2) {
+        int[][] tablero = game.getTablero();
+        if (distanciaFila + distanciaColumna > 2||distanciaFila > 2 || distanciaColumna > 2) {
             JOptionPane.showMessageDialog(null, "La casilla seleccionada no es válida para moverse.", "Casilla no válida", JOptionPane.ERROR_MESSAGE);
-        } else {
+        }else{
             game.setElemento(fila, columna, 0);
             fila = xPos;
             columna = yPos;
             game.setElemento(fila, columna, 1); 
-            game.cambiaTurno();
+            game.verificarVictoria();
+        	game.cambiaTurno();
         }
+        
     }
 
     /**
