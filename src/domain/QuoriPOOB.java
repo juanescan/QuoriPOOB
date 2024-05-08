@@ -26,6 +26,7 @@ public class QuoriPOOB {
         tablero = new int[size][size];
         tokens = new HashMap<>();
         inicializarTablero();
+        inicializarFichas();
         inicializarJugadores();
 
     }
@@ -40,7 +41,6 @@ public class QuoriPOOB {
             	}
             }
         }
-        inicializarFichas();
     }
     
     private void inicializarFichas() {
@@ -144,7 +144,7 @@ public class QuoriPOOB {
 	            return token;
 	        }
 	    }
-	    return null; // Retorna null si no se encuentra ningún token en las coordenadas especificadas
+	    return null; 
 	}
 	
 	public Player getCurrentPlayer() {

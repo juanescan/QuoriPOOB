@@ -2,7 +2,7 @@ package domain;
 
 public class Wall {
     private int size;
-    private boolean direction;
+    private boolean horizontal;
     private int xPosStart;
     private int xPosEnd;
     private int yPosStart;
@@ -10,7 +10,7 @@ public class Wall {
 
     public Wall(boolean horizontal,int xPosStart, int yPosStart, int xPosEnd, int yPosEnd) {
         this.size = 2;
-        this.direction = direction;
+        this.horizontal = horizontal;
         this.xPosStart = xPosStart;
         this.yPosStart = yPosStart;
         this.xPosEnd = xPosEnd;
@@ -21,8 +21,8 @@ public class Wall {
 		return size;
 	}
 
-	public boolean isDirection() {
-		return direction;
+	public boolean getHorizontal() {
+		return horizontal;
 	}
 
 	public int getxPosStart() {
