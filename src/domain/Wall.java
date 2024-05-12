@@ -1,6 +1,8 @@
 package domain;
 
-public class Wall {
+import java.io.Serializable;
+
+public class Wall implements Serializable {
     private int size;
     private boolean horizontal;
     private int xPosStart;

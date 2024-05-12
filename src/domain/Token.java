@@ -1,6 +1,7 @@
 package domain;
 
 import java.awt.Color;
+import java.io.Serializable;
 
 import javax.swing.JOptionPane;
 
@@ -9,7 +10,7 @@ import javax.swing.JOptionPane;
  * version 1.0
  * Santiago Córdoba
  */
-public class Token {
+public class Token implements Serializable {
  
     private int fila;
     private int columna;
@@ -45,8 +46,7 @@ public class Token {
             fila = xPos;
             columna = yPos;
             game.setElemento(fila, columna, 1); 
-            game.verificarVictoria();
-        	game.cambiaTurno();
+            
         }
         
     }

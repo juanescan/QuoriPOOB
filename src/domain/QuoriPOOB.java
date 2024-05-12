@@ -1,6 +1,13 @@
 package domain;
 
 import java.awt.Color;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,7 +15,7 @@ import javax.swing.JOptionPane;
 /**
  * prueba
  */
-public class QuoriPOOB {
+public class QuoriPOOB implements Serializable {
     private int size = 17;
     private int[][] tablero;
     private Map<Integer,Token> tokens;
@@ -68,13 +75,15 @@ public class QuoriPOOB {
     	}
     }
     
-    public void verificarVictoria() {
+    public boolean verificarVictoria() {
     	Token t = currentPlayer.getToken();
     	int fila = t.getFila();
     	if(currentPlayer == player1 && fila == 16 || currentPlayer == player2 && fila == 0) {
-    		JOptionPane.showMessageDialog(null, "El jugador " + currentPlayer.getName() + " ha ganado el juego");
+    		return true;
     	}
-    	
+    	else {
+    		return false;
+    	}
     }
     
     
@@ -120,6 +129,25 @@ public class QuoriPOOB {
     	
     }
     
+    public static QuoriPOOB open(File archivo) throws IOException, ClassNotFoundException {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(archivo))) {
+            QuoriPOOB game = (QuoriPOOB) in.readObject();
+            game.tokens = new HashMap<>();
+            for (Token token : game.tokens.values()) {
+                int fila = token.getFila();
+                int columna = token.getColumna();
+                game.tablero[fila][columna] = 1; // Actualiza el tablero con las posiciones de las fichas
+            }
+            return game;
+        }
+    }
+
+    
+    public void save(File archivo) throws IOException {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(archivo))) {
+            out.writeObject(this);
+        }
+    }
     
     public int getSize() {
 		return size;

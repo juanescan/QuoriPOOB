@@ -12,6 +12,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.List;
@@ -26,10 +27,12 @@ public class QuoriPOOBGUI extends JFrame{
 
     private JMenuBar barra;
     private JMenu menu;
+    private JMenu terminar;
     private JMenuItem abrir;
-    private JMenuItem nuevo;
     private JMenuItem salir;
     private JMenuItem salvar;
+    private JMenuItem pantalla_Inicio;
+    private JMenuItem reiniciar;
     private JFileChooser fileChooser;
     private JButton[][] casillas;
     private JTextField movs;
@@ -40,6 +43,7 @@ public class QuoriPOOBGUI extends JFrame{
     private JPanel main;
     private QuoriPOOB game;
     private int[][] tablero;
+    
 
     public QuoriPOOBGUI(){
 
@@ -93,17 +97,22 @@ public class QuoriPOOBGUI extends JFrame{
     private void prepareElementsMenu(){
         barra = new JMenuBar();
         menu = new JMenu("Archivos");
+        terminar = new JMenu("Terminar");
         abrir= new JMenuItem("abrir");
-        nuevo = new JMenuItem("nuevo");
         salvar = new JMenuItem("salvar");
         salir = new JMenuItem("salir");
+        pantalla_Inicio = new JMenuItem("pantalla inicio");
+        reiniciar = new JMenuItem("reiniciar");
 
         setJMenuBar(barra);
         barra.add(menu);
-        menu.add(nuevo);
+        barra.add(terminar);
         menu.add(abrir);
         menu.add(salvar);
         menu.add(salir);
+        terminar.add(pantalla_Inicio);
+        terminar.add(reiniciar);
+        terminar.add(salir);
     }
 
     private void prepareElementsBoard(){
@@ -135,7 +144,15 @@ public class QuoriPOOBGUI extends JFrame{
 
         abrir.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent ev){
-                actionOpen();
+                try {
+					actionOpen();
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
             }
         });
 
@@ -152,9 +169,15 @@ public class QuoriPOOBGUI extends JFrame{
         	}
         });
         
-        nuevo.addActionListener(new ActionListener() {
+        reiniciar.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent ev) {
         		resetGame();
+        	}
+        });
+        
+        pantalla_Inicio.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent ev) {
+        		actionInitialScreen();
         	}
         });
         
@@ -179,21 +202,38 @@ public class QuoriPOOBGUI extends JFrame{
         }
     }
 
-    private void actionOpen() {
+    private void actionOpen() throws IOException, ClassNotFoundException {
+        JFileChooser fileChooser = new JFileChooser();
         fileChooser.setVisible(true);
         int selection = fileChooser.showOpenDialog(this);
         if (selection == JFileChooser.APPROVE_OPTION) {
-            File fichero = fileChooser.getSelectedFile();
-            JOptionPane.showMessageDialog(this, "the file " + fichero.getName() + " can not be opened because the functionalities are under construction");
+            File archivo = fileChooser.getSelectedFile();
+            try {
+                QuoriPOOB g = QuoriPOOB.open(archivo); // Cambia QuoriPOOB.open a lo que sea que uses para abrir archivos
+                game = g;
+                paintFichas();
+                paintWall();
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null, "Error al abrir el archivo: " + e.getMessage());
+            }
         }
     }
 
-    private void actionSave(){
+
+
+    private void actionSave() {
+        JFileChooser fileChooser = new JFileChooser();
         fileChooser.setVisible(true);
-        int selection = fileChooser.showSaveDialog(this);
-        if (selection == JFileChooser.APPROVE_OPTION) {
-            File fichero = fileChooser.getSelectedFile();
-            JOptionPane.showMessageDialog(this, "the file " + fichero.getName() + " can not be saved because the functionalities are under construction");
+        int sel = fileChooser.showSaveDialog(this);
+        if (sel == JFileChooser.APPROVE_OPTION) {
+            File archivo = fileChooser.getSelectedFile();
+            String filePath = archivo.getAbsolutePath();
+            try {
+                game.save(archivo);
+                JOptionPane.showMessageDialog(null, "Se ha guardado exitosamente en: " + filePath);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null, "Error al guardar el archivo: " + e.getMessage());
+            }
         }
     }
     
@@ -202,9 +242,20 @@ public class QuoriPOOBGUI extends JFrame{
         tablero = game.getTablero();
         prepareElementsBoard();
         remove(initialScreen);
-        revalidate();
         repaint();
+        revalidate();
     }
+    
+    private void actionInitialScreen() {
+    	remove(main);
+    	prepareInitialScreen();
+    	prepareElementsMenu();
+    	prepareActions();
+    	repaint();
+    	revalidate();
+    }
+    
+    
     
     private void prepareActionsBoard(){
         for(int i = 0; i < 17; i++){
@@ -288,16 +339,20 @@ public class QuoriPOOBGUI extends JFrame{
     }
     
     private void paintFichas() {
-        for(int i = 0; i < 17; i++){
-            for(int j = 0; j < 17; j++){
-                if (tablero[i][j] == 1){
-                    Token t = game.getToken(i,j);
-                    Color c = t.getColor();
-                    casillas[i][j].setBackground(c); 
-                }else if(tablero[i][j] == 0) {
-                	casillas[i][j].setBackground(Color.white);
+        for (int i = 0; i < 17; i++) {
+            for (int j = 0; j < 17; j++) {
+                if (tablero[i][j] == 1) {
+                    Token t = game.getToken(i, j);
+                    if (t != null) { // Verifica si el token no es null antes de acceder a su color
+                        Color c = t.getColor();
+                        casillas[i][j].setBackground(c);
+                    } else {
+                        // Tratar el caso donde el token es null
+                    }
+                } else if (tablero[i][j] == 0) {
+                    casillas[i][j].setBackground(Color.white);
                 }
-                	
+
             }
         }
         revalidate();
@@ -338,6 +393,17 @@ public class QuoriPOOBGUI extends JFrame{
         int columna = (int)button.getClientProperty("columna");
         game.move(fila, columna); 
         paintFichas();
+        boolean verify = game.verificarVictoria();
+        if(verify) {
+        	int confirmado = JOptionPane.showConfirmDialog(this, "El jugador " + game.getCurrentPlayer().getName() + " ha ganado el juego. ¿Quieres salir del juego?", "Victoria", JOptionPane.YES_NO_OPTION);
+            if (confirmado == JOptionPane.YES_OPTION) {
+                actionClose(); // Cierra la ventana
+            } else {
+                actionInitialScreen(); // Va a la pantalla de inicio
+            }
+        }
+        game.cambiaTurno();
+        
     }
     
     private void actionWall(JButton button) {

@@ -1,9 +1,10 @@
 package domain;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Player {
+public class Player implements Serializable{
 	private String name;
 	private int nWalls;
 	private Token token;
