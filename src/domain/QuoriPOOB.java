@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
 /**
  * prueba
  */
-public class QuoriPOOB implements Serializable {
+public class QuoriPOOB  implements Serializable {
     private int size = 17;
     private int[][] tablero;
     private Map<Integer,Token> tokens;
@@ -131,14 +131,7 @@ public class QuoriPOOB implements Serializable {
     
     public static QuoriPOOB open(File archivo) throws IOException, ClassNotFoundException {
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(archivo))) {
-            QuoriPOOB game = (QuoriPOOB) in.readObject();
-            game.tokens = new HashMap<>();
-            for (Token token : game.tokens.values()) {
-                int fila = token.getFila();
-                int columna = token.getColumna();
-                game.tablero[fila][columna] = 1; // Actualiza el tablero con las posiciones de las fichas
-            }
-            return game;
+            return (QuoriPOOB ) in.readObject();
         }
     }
 

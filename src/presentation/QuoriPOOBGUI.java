@@ -339,20 +339,16 @@ public class QuoriPOOBGUI extends JFrame{
     }
     
     private void paintFichas() {
-        for (int i = 0; i < 17; i++) {
-            for (int j = 0; j < 17; j++) {
-                if (tablero[i][j] == 1) {
-                    Token t = game.getToken(i, j);
-                    if (t != null) { // Verifica si el token no es null antes de acceder a su color
-                        Color c = t.getColor();
-                        casillas[i][j].setBackground(c);
-                    } else {
-                        // Tratar el caso donde el token es null
-                    }
-                } else if (tablero[i][j] == 0) {
-                    casillas[i][j].setBackground(Color.white);
+        for(int i = 0; i < 17; i++){
+            for(int j = 0; j < 17; j++){
+                if (tablero[i][j] == 1){
+                    Token t = game.getToken(i,j);
+                    Color c = t.getColor();
+                    casillas[i][j].setBackground(c); 
+                }else if(tablero[i][j] == 0) {
+                	casillas[i][j].setBackground(Color.white);
                 }
-
+                	
             }
         }
         revalidate();
