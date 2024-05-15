@@ -1,5 +1,6 @@
 package domain;
 
+import java.awt.Color;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,11 +10,13 @@ public class Player implements Serializable{
 	private int nWalls;
 	private Token token;
 
+
 	
 	public Player(String name,Token token, int nWalls) {
 		this.name = name;
 		this.token = token;
 		this.nWalls = nWalls;
+
 		
 	}
 

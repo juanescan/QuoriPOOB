@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JOptionPane;
@@ -19,20 +21,27 @@ public class QuoriPOOB  implements Serializable {
     private int size = 17;
     private int[][] tablero;
     private Map<Integer,Token> tokens;
+    private Map<Integer,Color> colorTokens;
     private Player player1;
     private Player player2;
     private Player currentPlayer;
     private Token t1;
     private Token t2;
+    private List<Cell> Cells;
 
 
 
   
 
-	public QuoriPOOB(){
+	public QuoriPOOB(Color player1Color , Color player2Color){
         tablero = new int[size][size];
         tokens = new HashMap<>();
+        Cells = new ArrayList<>();
+        colorTokens = new HashMap<>();
+        colorTokens.put(1, player1Color);
+        colorTokens.put(2, player2Color);
         inicializarTablero();
+        inicializarCasillas();
         inicializarFichas();
         inicializarJugadores();
 
@@ -43,6 +52,8 @@ public class QuoriPOOB  implements Serializable {
             for (int j = 0; j < tablero[i].length; j++){
             	if(i % 2 != 0 || j % 2 != 0) {
             		tablero[i][j] = 2;
+            	}else if(i % 2 != 0 && j % 2 != 0) {
+            		tablero[i][j] = 4;
             	}else {
             		tablero[i][j] = 0;
             	}
@@ -50,14 +61,28 @@ public class QuoriPOOB  implements Serializable {
         }
     }
     
+    private void inicializarCasillas() {
+    	int nFilas = tablero.length;
+    	int nColumnas = tablero.length;
+    	for(int i = 0; i < nFilas;i++) {
+    		for(int j = 0; j < nColumnas;j++) {
+    			if(tablero[i][j] == 0) {
+    				NormalCell normalCell = new NormalCell(i, j); 
+                    Cells.add(normalCell);
+    			}
+    		}
+    	}
+    }
+    
     private void inicializarFichas() {
-    	t1 = new Token(0,8,Color.blue,this);
-    	tablero[0][8] = 1;
-    	tokens.put(1,t1);
-    	t2 = new Token(16,8,Color.red,this);
-    	tablero[16][8] = 1;
-    	tokens.put(2,t2);
-    	
+        Color colorJugador1 = colorTokens.get(1);
+        Color colorJugador2 = colorTokens.get(2);
+        t1 = new Token(0, 8, colorJugador1, this);
+        tablero[0][8] = 1;
+        tokens.put(1, t1);
+        t2 = new Token(16, 8, colorJugador2, this);
+        tablero[16][8] = 1;
+        tokens.put(2, t2);
     }
     
     private void inicializarJugadores() {
@@ -90,6 +115,7 @@ public class QuoriPOOB  implements Serializable {
     public void move(int xPos, int yPos) {
     	Token t = getCurrentPlayer().getToken();
     	t.move(xPos, yPos);
+    
     } 	
     
     public void setElemento(int fila, int columna, int valor){
@@ -124,23 +150,23 @@ public class QuoriPOOB  implements Serializable {
         		}
         	}
         	currentPlayer.minusNWalls();
-        	cambiaTurno();
+        	
+    	}else {
+    		JOptionPane.showMessageDialog(null, "El jugador " + currentPlayer.getName() + " ya no tiene paredes que poner");
     	}
     	
     }
     
-    public static QuoriPOOB open(File archivo) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(archivo))) {
-            return (QuoriPOOB ) in.readObject();
-        }
+    public void save(File archivo) {
+        
     }
 
-    
-    public void save(File archivo) throws IOException {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(archivo))) {
-            out.writeObject(this);
-        }
+    // Método para abrir un objeto QuoriPOOB desde un archivo
+    public static QuoriPOOB open(File archivo) {
+		return null;
+        
     }
+    
     
     public int getSize() {
 		return size;
@@ -170,6 +196,14 @@ public class QuoriPOOB  implements Serializable {
 	
 	public Player getCurrentPlayer() {
 		return currentPlayer;
+	}
+	
+	public Player getPlayer1() {
+		return player1;
+	}
+	
+	public Player getPlayer2() {
+		return player2;
 	}
 
 	
