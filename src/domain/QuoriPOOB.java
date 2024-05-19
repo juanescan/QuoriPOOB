@@ -29,6 +29,7 @@ public class QuoriPOOB  implements Serializable {
     private Token t1;
     private Token t2;
     private List<Cell> Cells;
+	private Object gameMode;
 
 
 
@@ -37,7 +38,8 @@ public class QuoriPOOB  implements Serializable {
  * 
  * Constructor
  */
-	private QuoriPOOB(Color player1Color , Color player2Color){
+	public QuoriPOOB(Color player1Color , Color player2Color){
+		
         tablero = new int[size][size];
         tokens = new HashMap<>();
         Cells = new ArrayList<>();
@@ -50,6 +52,7 @@ public class QuoriPOOB  implements Serializable {
         inicializarJugadores();
 
     }
+	
     
 	public static synchronized QuoriPOOB obtenerInstancia(Color player1Color, Color player2Color) {
         if (instanciaUnica == null) {
@@ -98,9 +101,9 @@ public class QuoriPOOB  implements Serializable {
     
     private void inicializarJugadores() {
     	player1 = new Player("Jugador 1",t1, 10);
-        player2 = new Player("Jugador 2",t2, 10);
-        currentPlayer = player1;
-    }
+    	player2 = new Player("Jugador 2",t2, 10);
+    	currentPlayer = player1;
+    	}
     
     
     public void cambiaTurno() {

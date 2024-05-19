@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 /**
  * Represents the logic of a token in the Square game.
  * version 1.0
- * Santiago Córdoba
+ * Santiago Córdoba y Juan Cancelado
  */
 public class Token implements Serializable {
  
