@@ -231,6 +231,7 @@ public class QuoriPOOBGUI extends JFrame{
         if(confirmado == JOptionPane.YES_OPTION){
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             dispose();
+            System.exit(0);
         }else{
             setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         }
