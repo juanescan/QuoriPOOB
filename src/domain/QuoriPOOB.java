@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
  * prueba
  */
 public class QuoriPOOB  implements Serializable {
+	private static QuoriPOOB instanciaUnica;
     private int size = 17;
     private int[][] tablero;
     private Map<Integer,Token> tokens;
@@ -36,7 +37,7 @@ public class QuoriPOOB  implements Serializable {
  * 
  * Constructor
  */
-	public QuoriPOOB(Color player1Color , Color player2Color){
+	private QuoriPOOB(Color player1Color , Color player2Color){
         tablero = new int[size][size];
         tokens = new HashMap<>();
         Cells = new ArrayList<>();
@@ -50,6 +51,13 @@ public class QuoriPOOB  implements Serializable {
 
     }
     
+	public static synchronized QuoriPOOB obtenerInstancia(Color player1Color, Color player2Color) {
+        if (instanciaUnica == null) {
+            instanciaUnica = new QuoriPOOB(player1Color, player2Color);
+        }
+        return instanciaUnica;
+    }
+	
     private void inicializarTablero(){
         for (int i = 0; i < tablero.length; i++){
             for (int j = 0; j < tablero[i].length; j++){
