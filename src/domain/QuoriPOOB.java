@@ -32,7 +32,10 @@ public class QuoriPOOB  implements Serializable {
 
 
   
-
+/**
+ * 
+ * Constructor
+ */
 	public QuoriPOOB(Color player1Color , Color player2Color){
         tablero = new int[size][size];
         tokens = new HashMap<>();
