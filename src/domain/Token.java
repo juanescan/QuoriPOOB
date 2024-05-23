@@ -20,6 +20,8 @@ public class Token implements Serializable {
     private QuoriPOOB game;
     private Color color;
     private List<int[]> casillasValidas = new ArrayList<>();
+    private List<int[]> posicionesFicha = new ArrayList<>();
+
 
     /**
      * Constructs a new Token with the specified color, row, column, and game reference.
@@ -30,6 +32,8 @@ public class Token implements Serializable {
      * @param game    The Square game instance.
      */
     public Token( int fila, int columna,Color color, QuoriPOOB game) {
+    	
+    	posicionesFicha.add(new int[]{fila, columna});
         this.fila = fila;
         this.columna = columna;
         this.color = color;
@@ -52,14 +56,12 @@ public class Token implements Serializable {
             fila = xPos;
             columna = yPos;
             game.setElemento(fila, columna, 1);
+            posicionesFicha.add(new int[]{xPos, yPos});
             return true;
         }
         return false;
     }
     
-    
-    
-
 
 	private boolean casillaValida(int xPos, int yPos) {
     	boolean validate = false;
@@ -71,7 +73,8 @@ public class Token implements Serializable {
     	return validate;
     }
     
-    private boolean casillaPosible(int xPos, int yPos) {
+
+	private boolean casillaPosible(int xPos, int yPos) {
     	int distanciaFila = Math.abs(fila - xPos);
         int distanciaColumna = Math.abs(columna - yPos);
     	if(distanciaFila + distanciaColumna > 2||distanciaFila > 2 || distanciaColumna > 2) {
@@ -109,17 +112,17 @@ public class Token implements Serializable {
             int filaC = coordenadas[0];
             int columnaC = coordenadas[1];
             if (tablero[filaC][columnaC] == 1) {
-                if (filaC > fila && filaC != 16) {
+                if (filaC > fila && filaC != game.getSize() -1 ) {
                     coordenadasToAdd.add(new int[]{filaC + 2, columnaC});
                     iterator.remove();
-                } else if (filaC > fila && filaC == 16 && columna != 0 && columna != 16) {
+                } else if (filaC > fila && filaC == game.getSize() -1  && columna != 0 && columna != game.getSize() -1 ) {
                     coordenadasToAdd.add(new int[]{fila + 2, columna - 2});
                     coordenadasToAdd.add(new int[]{fila + 2, columna + 2});
                     iterator.remove();
-                } else if (filaC > fila && filaC == 16 && columna == 0) {
+                } else if (filaC > fila && filaC == game.getSize() -1  && columna == 0) {
                     iterator.remove();
                     casillasValidas.add(new int[]{fila + 2, columna + 2});
-                } else if (filaC > fila && filaC == 16 && columna == 16) {
+                } else if (filaC > fila && filaC == game.getSize() -1  && columna == game.getSize() -1 ) {
                     iterator.remove();
                     casillasValidas.add(new int[]{fila + 2, columna - 2});
                 }
@@ -140,14 +143,14 @@ public class Token implements Serializable {
                 if (filaC < fila && filaC != 0) {
                     coordenadasToAdd.add(new int[]{filaC - 2, columnaC});
                     iterator.remove();
-                } else if (filaC < fila && filaC == 0 && columna != 0 && columna != 16) {
+                } else if (filaC < fila && filaC == 0 && columna != 0 && columna != game.getSize() -1 ) {
                     coordenadasToAdd.add(new int[]{fila - 2, columna - 2});
                     coordenadasToAdd.add(new int[]{fila - 2, columna + 2});
                     iterator.remove();
                 } else if (filaC < fila && filaC == 0 && columna == 0) {
                     coordenadasToAdd.add(new int[]{fila - 2, columna + 2});
                     iterator.remove();
-                } else if (filaC < fila && filaC == 0 && columna == 16) {
+                } else if (filaC < fila && filaC == 0 && columna == game.getSize() -1 ) {
                     coordenadasToAdd.add(new int[]{fila - 2, columna - 2});
                     iterator.remove();
                 }
@@ -166,17 +169,17 @@ public class Token implements Serializable {
             int filaC = coordenadas[0];
             int columnaC = coordenadas[1];
             if (tablero[filaC][columnaC] == 1) {
-                if (columnaC > columna && columnaC != 16) {
+                if (columnaC > columna && columnaC != game.getSize() -1 ) {
                     coordenadasToAdd.add(new int[]{filaC, columnaC + 2});
                     iterator.remove();
-                } else if (columnaC > columna && columnaC == 16 && fila != 0 && fila != 16) {
+                } else if (columnaC > columna && columnaC == game.getSize() -1  && fila != 0 && fila != game.getSize() -1 ) {
                     coordenadasToAdd.add(new int[]{fila - 2, columna + 2});
                     coordenadasToAdd.add(new int[]{fila + 2, columna + 2});
                     iterator.remove();
-                } else if (columnaC > columna && columnaC == 16 && fila == 0) {
+                } else if (columnaC > columna && columnaC == game.getSize() -1  && fila == 0) {
                     iterator.remove();
                     casillasValidas.add(new int[]{fila + 2, columna + 2});
-                } else if (columnaC > columna && columnaC == 16 && fila == 16) {
+                } else if (columnaC > columna && columnaC == game.getSize() -1  && fila == game.getSize() -1 ) {
                     iterator.remove();
                     casillasValidas.add(new int[]{fila - 2, columna + 2});
                 }
@@ -197,14 +200,14 @@ public class Token implements Serializable {
                 if (columnaC < columna && columnaC != 0) {
                     coordenadasToAdd.add(new int[]{filaC, columnaC - 2});
                     iterator.remove();
-                } else if (columnaC < columna && columnaC == 0 && fila != 0 && fila != 16) {
+                } else if (columnaC < columna && columnaC == 0 && fila != 0 && fila != game.getSize() -1 ) {
                     coordenadasToAdd.add(new int[]{fila - 2, columna - 2});
                     coordenadasToAdd.add(new int[]{fila + 2, columna - 2});
                     iterator.remove();
                 } else if (columnaC < columna && columnaC == 0 && fila == 0) {
                     iterator.remove();
                     casillasValidas.add(new int[]{fila + 2, columna - 2});
-                } else if (columnaC < columna && columnaC == 0 && fila == 16) {
+                } else if (columnaC < columna && columnaC == 0 && fila == game.getSize() -1 ) {
                     iterator.remove();
                     casillasValidas.add(new int[]{fila - 2, columna - 2});
                 }
@@ -213,10 +216,15 @@ public class Token implements Serializable {
         casillasValidas.addAll(coordenadasToAdd);
     }
     
+    /**
+     * @param xPos
+     * @param yPos
+     * @return
+     */
     private boolean paredArriba(int xPos, int yPos) {
     	int[][] tablero = game.getTablero();
     	if( xPos < fila) {
-    		if(tablero[xPos+1][yPos] == 3  ) {
+    		if(tablero[xPos+1][yPos] == 3 || tablero[xPos+1][yPos] == 9 || tablero[xPos+1][yPos] == 8) {
             	JOptionPane.showMessageDialog(null, "No puede poner la ficha debido a que una pared enfrente suyo");
             	return true;
             }
@@ -228,7 +236,7 @@ public class Token implements Serializable {
     private boolean paredAbajo(int xPos, int yPos) {
     	int[][] tablero = game.getTablero();
     	if( xPos > fila) {
-    		if(tablero[xPos-1][yPos] == 3  ) {
+    		if(tablero[xPos-1][yPos] == 3 || tablero[xPos-1][yPos] == 9 || tablero[xPos-1][yPos] == 8 ) {
             	JOptionPane.showMessageDialog(null, "No puede poner la ficha debido a que una pared enfrente suyo");
             	return true;
             }
@@ -239,7 +247,7 @@ public class Token implements Serializable {
     private boolean paredDerecha(int xPos, int yPos) {
     	int[][] tablero = game.getTablero();
     	if(yPos > columna) {
-    		if(tablero[xPos][yPos - 1] == 3) {
+    		if(tablero[xPos][yPos - 1] == 3 || tablero[xPos][yPos - 1] == 9 || tablero[xPos][yPos-1] == 8) {
     			JOptionPane.showMessageDialog(null, "No puede poner la ficha debido a que una pared enfrente suyo");
             	return true;
     		}
@@ -250,7 +258,7 @@ public class Token implements Serializable {
     private boolean paredIzquierda(int xPos, int yPos) {
     	int[][] tablero = game.getTablero();
     	if(yPos < columna) {
-    		if(tablero[xPos][yPos + 1] == 3) {
+    		if(tablero[xPos][yPos + 1] == 3 || tablero[xPos][yPos + 1] == 9 || tablero[xPos][yPos + 1] == 8) {
     			JOptionPane.showMessageDialog(null, "No puede poner la ficha debido a que una pared enfrente suyo");
             	return true;
     		}
@@ -258,6 +266,10 @@ public class Token implements Serializable {
     	return false;
     }
     	
+    
+    public List<int[]> getPosicionesFicha() {
+		return posicionesFicha;
+	}
 
     /**
      * Gets the row index of the token.
@@ -276,6 +288,14 @@ public class Token implements Serializable {
     public int getColumna() {
         return columna;
     }
+    
+    public void setFila(int fila) {
+		this.fila = fila;
+	}
+
+	public void setColumna(int columna) {
+		this.columna = columna;
+	}
     
     public Color getColor() {
     	return color;

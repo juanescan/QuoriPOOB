@@ -13,7 +13,7 @@ public abstract class Cell implements Serializable{
 		this.columna = columna;
 	}
 
-	public abstract void act();
+	public abstract void act() throws QuoriPOOBException;
 	
 	
 	
