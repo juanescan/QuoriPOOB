@@ -107,7 +107,7 @@ public class QuoriPOOB  implements Serializable {
     }
     
     /**
-     * 
+     * inicializa las casillas del juego
      */
     private void inicializarCasillas() {
     	int nFilas = tablero.length;
@@ -127,7 +127,9 @@ public class QuoriPOOB  implements Serializable {
     	asignarCRegresar(posicionesCasillas);
     	asignarCNormales(posicionesCasillas);
     }
-    
+    /**
+     * inicializa las fichas del juego
+     */
     private void inicializarFichas() {
     	int mitad = (size -1) / 2;
         Color colorJugador1 = colorTokens.get(1);
@@ -142,14 +144,18 @@ public class QuoriPOOB  implements Serializable {
     
     
 
-
+    /**
+     * inicializa los jugadores del juego
+     */
 	private void inicializarJugadores() {
     	player1 = new Player("Jugador 1",t1, 10);
     	player2 = new Player("Jugador 2",t2, 10);
     	currentPlayer = player1;
     	}
     
-    
+    /**
+     * cambia el turno cuando se realiza una accion
+     */
     public void cambiaTurno() {
     	if(currentPlayer == player1) {
     		currentPlayer = player2;
@@ -157,14 +163,18 @@ public class QuoriPOOB  implements Serializable {
     		currentPlayer = player1;
     	}
     }
-    
+    /**
+     * verifica quien gana el juego
+     */
     public boolean verificarVictoria() {
         Token t = currentPlayer.getToken();
         int fila = t.getFila();
         return (currentPlayer == player1 && fila == size-1) || (currentPlayer == player2 && fila == 0);
     }
     
-    
+    /**
+     * mueve las fichas dependiendo de quien es el turno
+     */
     public boolean move(int xPos, int yPos) throws QuoriPOOBException {
     	Token t = getCurrentPlayer().getToken();
     	boolean movHecho = t.move(xPos, yPos);
@@ -179,7 +189,9 @@ public class QuoriPOOB  implements Serializable {
     public void setElemento(int fila, int columna, int valor){
         tablero[fila][columna] = valor;
     }
-    
+    /**
+     * coloca una barrera en una posicion deseada
+     */
     public void putWall(boolean horizontal,int xPos, int yPos, String tipo) {
     	if(currentPlayer.getNWalls() > 0) {
     		try {
@@ -194,7 +206,9 @@ public class QuoriPOOB  implements Serializable {
     		JOptionPane.showMessageDialog(null, "El jugador " + currentPlayer.getName() + " ya no tiene paredes que poner");
     	}
     }
-    
+    /**
+     * guarda la partida
+     */
     public void save(File archivo) {
     	 try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(archivo))) {
              outputStream.writeObject(this); 
@@ -324,7 +338,9 @@ public class QuoriPOOB  implements Serializable {
 	        }
 	    }
 	}
-	
+	/**
+	 * casilla para regresar
+	 */
 	private void asignarCRegresar(List<int[]> posicionesCasillas) {
 		for (int i = 0; i < cTurnoDoble; i++) {
 	        if (i < posicionesCasillas.size()) {
@@ -336,7 +352,9 @@ public class QuoriPOOB  implements Serializable {
 	        }
 	    }
 	}
-	
+	/**
+	 * casillas normales
+	 */
 	private void asignarCNormales(List<int[]> posicionesCasillas) {
 		while (!posicionesCasillas.isEmpty()) {
 	        int[] pos = posicionesCasillas.remove(0);
@@ -345,7 +363,9 @@ public class QuoriPOOB  implements Serializable {
 	        tablero[pos[0]][pos[1]] = 0; 
 	    }
 	}
-	
+	/**
+	 * reinicia el tablero, casillas, fichas y jugadores
+	 */
 	public void reset() {
 		inicializarTablero();
         inicializarCasillas();
@@ -353,6 +373,9 @@ public class QuoriPOOB  implements Serializable {
         inicializarJugadores();
 	}
 	
+	/**
+	 * obtiene una casilla dada una fila y una columna
+	 */
 	public Cell getCell(int fila, int columna) {
 		for(Cell cell : Cells) {
 			if(cell.getFila() == fila && cell.getColumna() == columna) {
