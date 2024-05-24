@@ -7,11 +7,13 @@ public abstract class Wall implements Serializable {
     protected boolean horizontal;
     protected int xPos;
     protected int yPos;
+    protected Player player;
 
-    public Wall(boolean horizontal,int xPos, int yPos) {
+    public Wall(boolean horizontal,int xPos, int yPos, Player player) {
         this.horizontal = horizontal;
         this.xPos = xPos;
         this.yPos = yPos;
+        this.player = player;
 
     }
     

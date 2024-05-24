@@ -4,8 +4,9 @@ import javax.swing.JOptionPane;
 
 public class LargeWall extends Wall {
 	
-	public LargeWall(boolean horizontal,int xPos, int yPos) {
-		super(horizontal, xPos, yPos);
+	public LargeWall(boolean horizontal,int xPos, int yPos, Player player) {
+		super(horizontal, xPos, yPos, player);
+		player.minusLargas();
 	}
 	
 	private QuoriPOOB getInstanceOfGame() throws QuoriPOOBException {

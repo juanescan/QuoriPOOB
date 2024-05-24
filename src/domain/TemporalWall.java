@@ -6,8 +6,9 @@ public class TemporalWall extends Wall {
 	
 	private int count = 4;
 	
-	public TemporalWall(boolean horizontal,int xPos, int yPos) {
-		super(horizontal, xPos, yPos);
+	public TemporalWall(boolean horizontal,int xPos, int yPos, Player player) {
+		super(horizontal, xPos, yPos, player);
+		player.minusTemporales();
 	}
 	
 	private QuoriPOOB getInstanceOfGame() throws QuoriPOOBException {
@@ -16,9 +17,32 @@ public class TemporalWall extends Wall {
 	
 	public void act() throws QuoriPOOBException {
 		QuoriPOOB game = getInstanceOfGame();
+		int size = game.getSize();
+		int[][] tablero = game.getTablero();
 		count --;
 		if(count == 0) {
-			game.setElemento(xPos, yPos, 2);
+			if(horizontal) {
+				if(yPos <= size -3) {
+					tablero[xPos][yPos] = 2;
+					tablero[xPos][yPos+1] = 4;
+					tablero[xPos][yPos+2] = 2;
+				}else if(yPos > size -3) {
+					tablero[xPos][yPos] = 2;
+					tablero[xPos][yPos-1] = 4;
+					tablero[xPos][yPos-2] = 2;
+				}
+			}else if(!horizontal) {
+				if(xPos <= size -3){
+					tablero[xPos][yPos] = 2;
+					tablero[xPos+1][yPos] = 4;
+					tablero[xPos+2][yPos] = 2;
+				}else if(xPos > size - 3) {
+					tablero[xPos][yPos] = 2;
+					tablero[xPos-1][yPos] = 4;
+					tablero[xPos-2][yPos] = 2;
+				}
+				
+			}
 			
 		}
 	}
@@ -50,6 +74,7 @@ public class TemporalWall extends Wall {
 			tablero[xPos][yPos+2] = 8;
 			game.getCurrentPlayer().minusNWalls();
 			game.cambiaTurno();
+			act();
 		}
 	}
 	
@@ -62,6 +87,7 @@ public class TemporalWall extends Wall {
 			tablero[xPos][yPos-2] = 8;
 			game.getCurrentPlayer().minusNWalls();
 			game.cambiaTurno();
+			act();
 		}
 	}
 	
@@ -74,6 +100,7 @@ public class TemporalWall extends Wall {
 			tablero[xPos+2][yPos] = 8;
 			game.getCurrentPlayer().minusNWalls();
 			game.cambiaTurno();
+			act();
 		}
 	}
 	
@@ -86,6 +113,7 @@ public class TemporalWall extends Wall {
 			tablero[xPos-2][yPos] = 8;
 			game.getCurrentPlayer().minusNWalls();
 			game.cambiaTurno();
+			act();
 		}
 	}
 	

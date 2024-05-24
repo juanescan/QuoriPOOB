@@ -46,6 +46,9 @@ public class QuoriPOOB  implements Serializable {
 	private int cRegresar;
 	private int cTurnoDoble;
 	private List<int[]> posicionesCasillas;
+	private List<Wall> paredesPlayer1;
+	private List<Wall> paredesPlayer2;
+
 
 
   
@@ -62,12 +65,15 @@ public class QuoriPOOB  implements Serializable {
 		intTemporales(temporales);
 		intLargas(largas);
 		intAliadas(aliadas);
+		checkNumeroParedes();
 		intCTeletransportador(cTeletransportador);
 		intCRegresar(cRegresar);
 		intCTurnoDoble(cTurnoDoble);
         tablero = new int[this.size][this.size];
         tokens = new HashMap<>();
         Cells = new ArrayList<>();
+        paredesPlayer1 = new ArrayList<>();
+        paredesPlayer2 = new ArrayList<>();
         colorTokens = new HashMap<>();
         colorTokens.put(1, player1Color);
         colorTokens.put(2, player2Color);
@@ -75,6 +81,7 @@ public class QuoriPOOB  implements Serializable {
         inicializarCasillas();
         inicializarFichas();
         inicializarJugadores();
+        imprimir();
 
     }
 	
@@ -95,10 +102,10 @@ public class QuoriPOOB  implements Serializable {
     private void inicializarTablero(){
         for (int i = 0; i < tablero.length; i++){
             for (int j = 0; j < tablero[i].length; j++){
-            	if(i % 2 != 0 || j % 2 != 0) {
-            		tablero[i][j] = 2;
-            	}else if(i % 2 != 0 && j % 2 != 0) {
+            	if(i % 2 != 0  && j % 2 != 0) {
             		tablero[i][j] = 4;
+            	}else if(i % 2 != 0 || j % 2 != 0) {
+            		tablero[i][j] = 2;
             	}else {
             		tablero[i][j] = 0;
             	}
@@ -125,6 +132,7 @@ public class QuoriPOOB  implements Serializable {
     	Collections.shuffle(posicionesCasillas);
     	asignarDobleTurno(posicionesCasillas);
     	asignarCRegresar(posicionesCasillas);
+    	asignarCTeletransportar(posicionesCasillas);
     	asignarCNormales(posicionesCasillas);
     }
     /**
@@ -148,8 +156,8 @@ public class QuoriPOOB  implements Serializable {
      * inicializa los jugadores del juego
      */
 	private void inicializarJugadores() {
-    	player1 = new Player("Jugador 1",t1, 10);
-    	player2 = new Player("Jugador 2",t2, 10);
+    	player1 = new Player("Jugador 1",t1, nWalls, normales, largas, temporales, aliadas);
+    	player2 = new Player("Jugador 2",t2, nWalls, normales, largas, temporales, aliadas);
     	currentPlayer = player1;
     	}
     
@@ -182,6 +190,7 @@ public class QuoriPOOB  implements Serializable {
     		Cell c = getCell(xPos,yPos);
     		c.act();
     	}
+    	imprimir();
     	return movHecho;
     	
     } 	
@@ -196,9 +205,11 @@ public class QuoriPOOB  implements Serializable {
     	if(currentPlayer.getNWalls() > 0) {
     		try {
     			Class<?> wallClass = Class.forName("domain." + tipo);
-                Constructor<?> constructor = wallClass.getConstructor(boolean.class, int.class, int.class);
-                Wall wallInstance = (Wall) constructor.newInstance(horizontal, xPos, yPos);
+                Constructor<?> constructor = wallClass.getConstructor(boolean.class, int.class, int.class, Player.class);
+                Wall wallInstance = (Wall) constructor.newInstance(horizontal, xPos, yPos, currentPlayer);
                 wallInstance.put();
+                añadirPared(wallInstance);
+                imprimir();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -206,6 +217,7 @@ public class QuoriPOOB  implements Serializable {
     		JOptionPane.showMessageDialog(null, "El jugador " + currentPlayer.getName() + " ya no tiene paredes que poner");
     	}
     }
+    
     /**
      * guarda la partida
      */
@@ -323,6 +335,28 @@ public class QuoriPOOB  implements Serializable {
 		}
 	}
 	
+	private void checkNumeroParedes() {
+	    int n = (size + 1) / 2;
+	    int paredes = temporales + largas + aliadas;
+	    try {
+	        if (paredes > n) {
+	            throw new QuoriPOOBException(QuoriPOOBException.NUMERO_PAREDES);
+	        }else {
+	        	normales = n - paredes;
+	        	nWalls = n;
+	        }
+	    } catch (QuoriPOOBException e) {
+	        String temporales = JOptionPane.showInputDialog(null, "Reingrese el numero de paredes temporales: ");
+	        String largas = JOptionPane.showInputDialog(null, "Reingrese el numero de paredes largas: ");
+	        String aliadas = JOptionPane.showInputDialog(null, "Reingrese el numero de paredes aliadas: ");
+	        intTemporales(temporales);
+	        intLargas(largas);
+	        intAliadas(aliadas);
+	        checkNumeroParedes();
+	    }
+	}
+
+	
 	
 	/**
 	 * 5 = casilla de doble turno
@@ -342,7 +376,7 @@ public class QuoriPOOB  implements Serializable {
 	 * casilla para regresar
 	 */
 	private void asignarCRegresar(List<int[]> posicionesCasillas) {
-		for (int i = 0; i < cTurnoDoble; i++) {
+		for (int i = 0; i < cRegresar; i++) {
 	        if (i < posicionesCasillas.size()) {
 	            int[] pos = posicionesCasillas.get(i);
 	            posicionesCasillas.remove(i);
@@ -352,6 +386,19 @@ public class QuoriPOOB  implements Serializable {
 	        }
 	    }
 	}
+	
+	private void asignarCTeletransportar(List<int[]> posicionesCasillas) {
+		for (int i = 0; i < cTeletransportador; i++) {
+	        if (i < posicionesCasillas.size()) {
+	            int[] pos = posicionesCasillas.get(i);
+	            posicionesCasillas.remove(i);
+	            TeletransportatorCell teletransportatorCell = new TeletransportatorCell(pos[0], pos[1]);
+	            Cells.add(teletransportatorCell);
+	            tablero[pos[0]][pos[1]] = 6; 
+	        }
+	    }
+	}
+	
 	/**
 	 * casillas normales
 	 */
@@ -371,6 +418,27 @@ public class QuoriPOOB  implements Serializable {
         inicializarCasillas();
         inicializarFichas();
         inicializarJugadores();
+	}
+	
+	public static void resetInstance() {
+		instanciaUnica = null;
+	}
+	
+	private void añadirPared(Wall pared) {
+		if(currentPlayer == player1) {
+			paredesPlayer1.add(pared);
+		}else if (currentPlayer == player2) {
+			paredesPlayer2.add(pared);
+		}
+	}
+	
+	public void activarAct() throws QuoriPOOBException {
+		for(Wall w: paredesPlayer1) {
+			w.act();
+		}
+		for(Wall w: paredesPlayer2) {
+			w.act();
+		}
 	}
 	
 	/**
@@ -498,6 +566,16 @@ public class QuoriPOOB  implements Serializable {
 
 	public Map<Integer, Color> getColorTokens() {
 		return colorTokens;
+	}
+	
+	private void imprimir() {
+		for (int i = 0; i < tablero.length; i++) {
+            for (int j = 0; j < tablero[i].length; j++) {
+                System.out.print(tablero[i][j] + " ");
+            }
+            System.out.println(); // Salta a la siguiente línea después de imprimir cada fila
+            System.out.println();
+        }
 	}
 	
 	
