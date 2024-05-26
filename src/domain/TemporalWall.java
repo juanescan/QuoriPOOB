@@ -12,7 +12,7 @@ public class TemporalWall extends Wall {
 	}
 	
 	private QuoriPOOB getInstanceOfGame() throws QuoriPOOBException {
-		return QuoriPOOB.getInstance(null, null, null, null, null, null, null, null, null);
+		return QuoriPOOB.getInstance();
 	}
 	
 	public void act() throws QuoriPOOBException {
@@ -122,7 +122,7 @@ public class TemporalWall extends Wall {
 		int[][] tablero = game.getTablero();
 		if(tablero[xPos1][yPos1] == 3 || tablero[xPos2][yPos2] == 3 || tablero[xPos1][yPos1] == 9 || 
 				tablero[xPos2][yPos2] == 9 || tablero[xPos1][yPos1] == 8 || 
-						tablero[xPos2][yPos2] == 8) {
+						tablero[xPos2][yPos2] == 8 || tablero[xPos1][yPos1] == 10 || tablero[xPos2][yPos2] == 10 ) {
 			JOptionPane.showMessageDialog(null, "No se puede colocar la pared debido a que ya hay otra pared");
 			return true;
 		}

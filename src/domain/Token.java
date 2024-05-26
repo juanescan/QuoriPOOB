@@ -9,7 +9,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 /**
- * Represents the logic of a token in the Square game.
+ * Represents the logic of a token in the Square QuoriPOOB.getInstance().
  * version 1.0
  * Santiago Córdoba y Juan Cancelado
  */
@@ -17,27 +17,25 @@ public class Token implements Serializable {
  
     private int fila;
     private int columna;
-    private QuoriPOOB game;
     private Color color;
     private List<int[]> casillasValidas = new ArrayList<>();
     private List<int[]> posicionesFicha = new ArrayList<>();
 
 
     /**
-     * Constructs a new Token with the specified color, row, column, and game reference.
+     * Constructs a new Token with the specified color, row, column, and QuoriPOOB.getInstance() reference.
      * 
      * @param color   The color of the token.
      * @param fila    The row index of the token.
      * @param columna The column index of the token.
-     * @param game    The Square game instance.
+     * @param QuoriPOOB.getInstance()    The Square QuoriPOOB.getInstance() instance.
      */
-    public Token( int fila, int columna,Color color, QuoriPOOB game) {
+    public Token( int fila, int columna,Color color) {
     	
     	posicionesFicha.add(new int[]{fila, columna});
         this.fila = fila;
         this.columna = columna;
         this.color = color;
-        this.game = game;
     }
 
     /**
@@ -52,10 +50,10 @@ public class Token implements Serializable {
             JOptionPane.showMessageDialog(null, "La casilla seleccionada no es válida para moverse.", "Casilla no válida", JOptionPane.ERROR_MESSAGE);
             return false;
         } else if (!paredArriba(xPos, yPos) && !paredAbajo(xPos, yPos) && !paredDerecha(xPos, yPos) && !paredIzquierda(xPos, yPos)) {
-            game.setElemento(fila, columna, 0);
+            QuoriPOOB.getInstance().setElemento(fila, columna, 0);
             fila = xPos;
             columna = yPos;
-            game.setElemento(fila, columna, 1);
+            QuoriPOOB.getInstance().setElemento(fila, columna, 1);
             posicionesFicha.add(new int[]{xPos, yPos});
             return true;
         }
@@ -85,8 +83,8 @@ public class Token implements Serializable {
     
     private void casillasValidas() {
     	casillasValidas.clear();
-    	for(int i = 0; i < game.getSize(); i++) {
-    		for(int j = 0; j < game.getSize(); j++) {
+    	for(int i = 0; i < QuoriPOOB.getInstance().getSize(); i++) {
+    		for(int j = 0; j < QuoriPOOB.getInstance().getSize(); j++) {
     			if(casillaPosible(i,j)) {
     				int[] coordenadas = {i,j};
     				casillasValidas.add(coordenadas);
@@ -104,7 +102,7 @@ public class Token implements Serializable {
     
     
     private void saltarFichaVerticalArribaAAbajo() {
-        int[][] tablero = game.getTablero();
+        int[][] tablero = QuoriPOOB.getInstance().getTablero();
         List<int[]> coordenadasToAdd = new ArrayList<>();
         Iterator<int[]> iterator = casillasValidas.iterator();
         while (iterator.hasNext()) {
@@ -112,17 +110,17 @@ public class Token implements Serializable {
             int filaC = coordenadas[0];
             int columnaC = coordenadas[1];
             if (tablero[filaC][columnaC] == 1) {
-                if (filaC > fila && filaC != game.getSize() -1 ) {
+                if (filaC > fila && filaC != QuoriPOOB.getInstance().getSize() -1 ) {
                     coordenadasToAdd.add(new int[]{filaC + 2, columnaC});
                     iterator.remove();
-                } else if (filaC > fila && filaC == game.getSize() -1  && columna != 0 && columna != game.getSize() -1 ) {
+                } else if (filaC > fila && filaC == QuoriPOOB.getInstance().getSize() -1  && columna != 0 && columna != QuoriPOOB.getInstance().getSize() -1 ) {
                     coordenadasToAdd.add(new int[]{fila + 2, columna - 2});
                     coordenadasToAdd.add(new int[]{fila + 2, columna + 2});
                     iterator.remove();
-                } else if (filaC > fila && filaC == game.getSize() -1  && columna == 0) {
+                } else if (filaC > fila && filaC == QuoriPOOB.getInstance().getSize() -1  && columna == 0) {
                     iterator.remove();
                     casillasValidas.add(new int[]{fila + 2, columna + 2});
-                } else if (filaC > fila && filaC == game.getSize() -1  && columna == game.getSize() -1 ) {
+                } else if (filaC > fila && filaC == QuoriPOOB.getInstance().getSize() -1  && columna == QuoriPOOB.getInstance().getSize() -1 ) {
                     iterator.remove();
                     casillasValidas.add(new int[]{fila + 2, columna - 2});
                 }
@@ -132,7 +130,7 @@ public class Token implements Serializable {
     }
     
     private void saltarFichaVerticalAbajoAArriba() {
-        int[][] tablero = game.getTablero();
+        int[][] tablero = QuoriPOOB.getInstance().getTablero();
         List<int[]> coordenadasToAdd = new ArrayList<>();
         Iterator<int[]> iterator = casillasValidas.iterator();
         while (iterator.hasNext()) {
@@ -143,14 +141,14 @@ public class Token implements Serializable {
                 if (filaC < fila && filaC != 0) {
                     coordenadasToAdd.add(new int[]{filaC - 2, columnaC});
                     iterator.remove();
-                } else if (filaC < fila && filaC == 0 && columna != 0 && columna != game.getSize() -1 ) {
+                } else if (filaC < fila && filaC == 0 && columna != 0 && columna != QuoriPOOB.getInstance().getSize() -1 ) {
                     coordenadasToAdd.add(new int[]{fila - 2, columna - 2});
                     coordenadasToAdd.add(new int[]{fila - 2, columna + 2});
                     iterator.remove();
                 } else if (filaC < fila && filaC == 0 && columna == 0) {
                     coordenadasToAdd.add(new int[]{fila - 2, columna + 2});
                     iterator.remove();
-                } else if (filaC < fila && filaC == 0 && columna == game.getSize() -1 ) {
+                } else if (filaC < fila && filaC == 0 && columna == QuoriPOOB.getInstance().getSize() -1 ) {
                     coordenadasToAdd.add(new int[]{fila - 2, columna - 2});
                     iterator.remove();
                 }
@@ -161,7 +159,7 @@ public class Token implements Serializable {
     
     
     private void saltarFichasHorizontalIzquierdaADerecha() {
-        int[][] tablero = game.getTablero();
+        int[][] tablero = QuoriPOOB.getInstance().getTablero();
         List<int[]> coordenadasToAdd = new ArrayList<>();
         Iterator<int[]> iterator = casillasValidas.iterator();
         while (iterator.hasNext()) {
@@ -169,17 +167,17 @@ public class Token implements Serializable {
             int filaC = coordenadas[0];
             int columnaC = coordenadas[1];
             if (tablero[filaC][columnaC] == 1) {
-                if (columnaC > columna && columnaC != game.getSize() -1 ) {
+                if (columnaC > columna && columnaC != QuoriPOOB.getInstance().getSize() -1 ) {
                     coordenadasToAdd.add(new int[]{filaC, columnaC + 2});
                     iterator.remove();
-                } else if (columnaC > columna && columnaC == game.getSize() -1  && fila != 0 && fila != game.getSize() -1 ) {
+                } else if (columnaC > columna && columnaC == QuoriPOOB.getInstance().getSize() -1  && fila != 0 && fila != QuoriPOOB.getInstance().getSize() -1 ) {
                     coordenadasToAdd.add(new int[]{fila - 2, columna + 2});
                     coordenadasToAdd.add(new int[]{fila + 2, columna + 2});
                     iterator.remove();
-                } else if (columnaC > columna && columnaC == game.getSize() -1  && fila == 0) {
+                } else if (columnaC > columna && columnaC == QuoriPOOB.getInstance().getSize() -1  && fila == 0) {
                     iterator.remove();
                     casillasValidas.add(new int[]{fila + 2, columna + 2});
-                } else if (columnaC > columna && columnaC == game.getSize() -1  && fila == game.getSize() -1 ) {
+                } else if (columnaC > columna && columnaC == QuoriPOOB.getInstance().getSize() -1  && fila == QuoriPOOB.getInstance().getSize() -1 ) {
                     iterator.remove();
                     casillasValidas.add(new int[]{fila - 2, columna + 2});
                 }
@@ -189,7 +187,7 @@ public class Token implements Serializable {
     }
 
     private void saltarFichasHorizontalDerechaAIzquierda() {
-        int[][] tablero = game.getTablero();
+        int[][] tablero = QuoriPOOB.getInstance().getTablero();
         List<int[]> coordenadasToAdd = new ArrayList<>();
         Iterator<int[]> iterator = casillasValidas.iterator();
         while (iterator.hasNext()) {
@@ -200,14 +198,14 @@ public class Token implements Serializable {
                 if (columnaC < columna && columnaC != 0) {
                     coordenadasToAdd.add(new int[]{filaC, columnaC - 2});
                     iterator.remove();
-                } else if (columnaC < columna && columnaC == 0 && fila != 0 && fila != game.getSize() -1 ) {
+                } else if (columnaC < columna && columnaC == 0 && fila != 0 && fila != QuoriPOOB.getInstance().getSize() -1 ) {
                     coordenadasToAdd.add(new int[]{fila - 2, columna - 2});
                     coordenadasToAdd.add(new int[]{fila + 2, columna - 2});
                     iterator.remove();
                 } else if (columnaC < columna && columnaC == 0 && fila == 0) {
                     iterator.remove();
                     casillasValidas.add(new int[]{fila + 2, columna - 2});
-                } else if (columnaC < columna && columnaC == 0 && fila == game.getSize() -1 ) {
+                } else if (columnaC < columna && columnaC == 0 && fila == QuoriPOOB.getInstance().getSize() -1 ) {
                     iterator.remove();
                     casillasValidas.add(new int[]{fila - 2, columna - 2});
                 }
@@ -222,7 +220,7 @@ public class Token implements Serializable {
      * @return
      */
     private boolean paredArriba(int xPos, int yPos) {
-    	int[][] tablero = game.getTablero();
+    	int[][] tablero = QuoriPOOB.getInstance().getTablero();
     	if( xPos < fila) {
     		if(tablero[xPos+1][yPos] == 3 || tablero[xPos+1][yPos] == 9 || tablero[xPos+1][yPos] == 8) {
             	JOptionPane.showMessageDialog(null, "No puede poner la ficha debido a que una pared enfrente suyo");
@@ -234,7 +232,7 @@ public class Token implements Serializable {
     
     
     private boolean paredAbajo(int xPos, int yPos) {
-    	int[][] tablero = game.getTablero();
+    	int[][] tablero = QuoriPOOB.getInstance().getTablero();
     	if( xPos > fila) {
     		if(tablero[xPos-1][yPos] == 3 || tablero[xPos-1][yPos] == 9 || tablero[xPos-1][yPos] == 8 ) {
             	JOptionPane.showMessageDialog(null, "No puede poner la ficha debido a que una pared enfrente suyo");
@@ -245,7 +243,7 @@ public class Token implements Serializable {
     }
     
     private boolean paredDerecha(int xPos, int yPos) {
-    	int[][] tablero = game.getTablero();
+    	int[][] tablero = QuoriPOOB.getInstance().getTablero();
     	if(yPos > columna) {
     		if(tablero[xPos][yPos - 1] == 3 || tablero[xPos][yPos - 1] == 9 || tablero[xPos][yPos-1] == 8) {
     			JOptionPane.showMessageDialog(null, "No puede poner la ficha debido a que una pared enfrente suyo");
@@ -256,7 +254,7 @@ public class Token implements Serializable {
     }
     
     private boolean paredIzquierda(int xPos, int yPos) {
-    	int[][] tablero = game.getTablero();
+    	int[][] tablero = QuoriPOOB.getInstance().getTablero();
     	if(yPos < columna) {
     		if(tablero[xPos][yPos + 1] == 3 || tablero[xPos][yPos + 1] == 9 || tablero[xPos][yPos + 1] == 8) {
     			JOptionPane.showMessageDialog(null, "No puede poner la ficha debido a que una pared enfrente suyo");

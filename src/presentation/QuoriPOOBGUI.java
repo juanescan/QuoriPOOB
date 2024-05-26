@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 /*
- * Represents the QuoriPOOBGUI game
+ * Represents the QuoriPOOBGUI QuoriPOOB.getInstance()
  * version 1.0
  * Santiago Córdoba- Juan Cancelado
  */
@@ -43,7 +43,6 @@ public class QuoriPOOBGUI extends JFrame{
     private JButton inicioC;
     private JButton salirB;
     private JPanel main;
-    private QuoriPOOB game;
     private int[][] tablero;
     private JLabel paredesLabel1;
     private JLabel paredesLabel2;
@@ -232,12 +231,8 @@ public class QuoriPOOBGUI extends JFrame{
         
         reiniciar.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent ev) {
-        		try {
-					resetGame();
-				} catch (QuoriPOOBException e) {
-					e.printStackTrace();
-				}
-        	}
+				QuoriPOOB.getInstance().reset();
+        	}	
         });
         
         pantalla_Inicio.addActionListener(new ActionListener() {
@@ -257,7 +252,7 @@ public class QuoriPOOBGUI extends JFrame{
     }
 
 
-    private void actionClose(){
+    public void actionClose(){
         int confirmado = JOptionPane.showConfirmDialog(this,"Are you sure you want to exit");
         if(confirmado == JOptionPane.YES_OPTION){
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -273,12 +268,16 @@ public class QuoriPOOBGUI extends JFrame{
         int selection = fileChooser.showOpenDialog(this);
         if (selection == JFileChooser.APPROVE_OPTION) {
             File archivo = fileChooser.getSelectedFile();
-            String filePath = archivo.getAbsolutePath();
-            QuoriPOOB g = QuoriPOOB.open(archivo); // Cambia QuoriPOOB.open a lo que sea que uses para abrir archivos
-			game = g;
-			repintar();
-			paintFichas();
-			paintWall();
+            QuoriPOOB quoriPOOB = QuoriPOOB.open(archivo); 
+            if (quoriPOOB != null) {
+                QuoriPOOB.resetInstance(); 
+                QuoriPOOB.setInstanciaUnica(quoriPOOB);
+                repintar();
+                paintFichas(); 
+                paintWall(); 
+            } else {
+                System.out.println("Error al cargar el archivo.");
+            }
         }
     }
 
@@ -291,7 +290,7 @@ public class QuoriPOOBGUI extends JFrame{
         if (sel == JFileChooser.APPROVE_OPTION) {
             File archivo = fileChooser.getSelectedFile();
             String filePath = archivo.getAbsolutePath();
-            game.save(archivo);
+            QuoriPOOB.getInstance().save(archivo);
 			JOptionPane.showMessageDialog(null, "Se ha guardado exitosamente en: " + filePath);
         }
     }
@@ -300,7 +299,7 @@ public class QuoriPOOBGUI extends JFrame{
     	String modoSeleccionado = (String) modoDeJuego.getSelectedItem();
         String tipoSeleccionado = (String) tipoDeJuego.getSelectedItem();
         String nivelSeleccionado = (String) nivelDeDificultad.getSelectedItem();
-        if (tipoSeleccionado.equals("Contrarreloj")) {
+        if (tipoSeleccionado.equals("Contrarreloj") || tipoSeleccionado.equals("Cronometrado")) {
         	ingresarDatosContrarreloj();
         }else {
         	ingresarDatos();
@@ -317,7 +316,7 @@ public class QuoriPOOBGUI extends JFrame{
     	revalidate();
     }
     
-    private void actionInitialScreen() {
+    public void actionInitialScreen() {
     	remove(main);
     	prepareInitialScreen();
     	prepareElementsMenu();
@@ -395,18 +394,19 @@ public class QuoriPOOBGUI extends JFrame{
         datosJugador1Panel.setLayout(new GridLayout(7, 1));
         jugador1Turno = new JLabel("",SwingConstants.CENTER);
         datosJugador1Panel.add(jugador1Turno);
-        paredesLabel1 = new JLabel("Paredes: " + game.getPlayer1().getNWalls(), SwingConstants.CENTER);
-        normales1 = new JLabel("normales: " + game.getPlayer1().getNormales(), SwingConstants.CENTER);
-        aliadas1 = new JLabel("aliadas: " + game.getPlayer1().getAliadas(), SwingConstants.CENTER);
-        temporales1 = new JLabel("temporales: " + game.getPlayer1().getTemporales(), SwingConstants.CENTER);
-        largas1 = new JLabel("largas: " + game.getPlayer1().getLargas(), SwingConstants.CENTER);
+        paredesLabel1 = new JLabel("Paredes: " + QuoriPOOB.getInstance().getPlayer1().getNWalls(), SwingConstants.CENTER);
+        normales1 = new JLabel("normales: " + QuoriPOOB.getInstance().getPlayer1().getNormales(), SwingConstants.CENTER);
+        aliadas1 = new JLabel("aliadas: " + QuoriPOOB.getInstance().getPlayer1().getAliadas(), SwingConstants.CENTER);
+        temporales1 = new JLabel("temporales: " + QuoriPOOB.getInstance().getPlayer1().getTemporales(), SwingConstants.CENTER);
+        largas1 = new JLabel("largas: " + QuoriPOOB.getInstance().getPlayer1().getLargas(), SwingConstants.CENTER);
         datosJugador1Panel.add(paredesLabel1);
         datosJugador1Panel.add(normales1);
         datosJugador1Panel.add(aliadas1);
         datosJugador1Panel.add(temporales1);
         datosJugador1Panel.add(largas1);
-        if ("Contrarreloj".equals(tipoDeJuego.getSelectedItem())) {
-            contadorJugador1 = new Contador(tiempoJuegoContrarreloj,game); // Donde tiempoDeJuego es el tiempo inicial para el juego contrarreloj
+        if ("Contrarreloj".equals(tipoDeJuego.getSelectedItem()) || "Cronometrado".equals(tipoDeJuego.getSelectedItem())) {
+        	String tipoSeleccionado = (String) tipoDeJuego.getSelectedItem();
+            contadorJugador1 = new Contador(tiempoJuegoContrarreloj,tipoSeleccionado,this);  // Donde tiempoDeJuego es el tiempo inicial para el juego contrarreloj
             datosJugador1Panel.add(contadorJugador1); // O jugador2Panel, dependiendo de dónde lo quieras mostrar
         }
         jugador1Panel.add(datosJugador1Panel,BorderLayout.CENTER);
@@ -429,18 +429,19 @@ public class QuoriPOOBGUI extends JFrame{
         datosJugador2Panel.setLayout(new GridLayout(7, 1));
         jugador2Turno = new JLabel("",SwingConstants.CENTER);
         datosJugador2Panel.add(jugador2Turno);
-        paredesLabel2 = new JLabel("Paredes: " + game.getPlayer2().getNWalls(), SwingConstants.CENTER);
-        normales2 = new JLabel("normales: " + game.getPlayer2().getNormales(), SwingConstants.CENTER);
-        aliadas2 = new JLabel("aliadas: " + game.getPlayer2().getAliadas(), SwingConstants.CENTER);
-        temporales2 = new JLabel("temporales: " + game.getPlayer2().getTemporales(), SwingConstants.CENTER);
-        largas2 = new JLabel("largas: " + game.getPlayer2().getLargas(), SwingConstants.CENTER);
+        paredesLabel2 = new JLabel("Paredes: " + QuoriPOOB.getInstance().getPlayer2().getNWalls(), SwingConstants.CENTER);
+        normales2 = new JLabel("normales: " + QuoriPOOB.getInstance().getPlayer2().getNormales(), SwingConstants.CENTER);
+        aliadas2 = new JLabel("aliadas: " + QuoriPOOB.getInstance().getPlayer2().getAliadas(), SwingConstants.CENTER);
+        temporales2 = new JLabel("temporales: " + QuoriPOOB.getInstance().getPlayer2().getTemporales(), SwingConstants.CENTER);
+        largas2 = new JLabel("largas: " + QuoriPOOB.getInstance().getPlayer2().getLargas(), SwingConstants.CENTER);
         datosJugador2Panel.add(paredesLabel2);
         datosJugador2Panel.add(normales2);
         datosJugador2Panel.add(aliadas2);
         datosJugador2Panel.add(temporales2);
         datosJugador2Panel.add(largas2);
-        if ("Contrarreloj".equals(tipoDeJuego.getSelectedItem())) {
-            contadorJugador2 = new Contador(tiempoJuegoContrarreloj,game); // Donde tiempoDeJuego es el tiempo inicial para el juego contrarreloj
+        if ("Contrarreloj".equals(tipoDeJuego.getSelectedItem()) || "Cronometrado".equals(tipoDeJuego.getSelectedItem())) {
+        	String tipoSeleccionado = (String) tipoDeJuego.getSelectedItem();
+            contadorJugador2 = new Contador(tiempoJuegoContrarreloj,tipoSeleccionado,this); // Donde tiempoDeJuego es el tiempo inicial para el juego contrarreloj
             datosJugador2Panel.add(contadorJugador2); // O jugador2Panel, dependiendo de dónde lo quieras mostrar
         }
         jugador2Panel.add(datosJugador2Panel,BorderLayout.CENTER);
@@ -449,7 +450,7 @@ public class QuoriPOOBGUI extends JFrame{
 
 
     private void tableroPanel(JPanel mainPanel){
-    	this.size = game.getSize();
+    	this.size = QuoriPOOB.getInstance().getSize();
         JPanel boardPanel = new JPanel();
         boardPanel.setLayout(new GridLayout(size,size));
         casillas = new JButton[size][size];
@@ -511,8 +512,8 @@ public class QuoriPOOBGUI extends JFrame{
             	}
             }
         }
-        Token t1 = game.getT1();
-        Token t2 = game.getT2();
+        Token t1 = QuoriPOOB.getInstance().getT1();
+        Token t2 = QuoriPOOB.getInstance().getT2();
         Color c1 = t1.getColor();
         Color c2 = t2.getColor();
         casillas[t1.getFila()][t1.getColumna()].setBackground(c1);
@@ -532,12 +533,12 @@ public class QuoriPOOBGUI extends JFrame{
     private void actionCell(JButton button) throws QuoriPOOBException {
         int fila = (int) button.getClientProperty("fila");
         int columna = (int) button.getClientProperty("columna");
-        boolean moveSuccessful = game.move(fila, columna);
+        boolean moveSuccessful = QuoriPOOB.getInstance().move(fila, columna);
         if (moveSuccessful) {
             paintFichas();
-            boolean verify = game.verificarVictoria();
+            boolean verify = QuoriPOOB.getInstance().verificarVictoria();
             if (verify) {
-                int confirmado = JOptionPane.showConfirmDialog(this, "El jugador " + game.getCurrentPlayer().getName() + " ha ganado el juego. ¿Quieres salir del juego?", "Victoria", JOptionPane.YES_NO_OPTION);
+                int confirmado = JOptionPane.showConfirmDialog(this, "El jugador " + QuoriPOOB.getInstance().getCurrentPlayer().getName() + " ha ganado el juego. ¿Quieres salir del juego?", "Victoria", JOptionPane.YES_NO_OPTION);
                 if (confirmado == JOptionPane.YES_OPTION) {
                     actionClose();
                 } else {
@@ -545,8 +546,8 @@ public class QuoriPOOBGUI extends JFrame{
                 }
             } else {
             	paintFichas();
-            	game.cambiaTurno();
-            	game.activarAct();
+            	QuoriPOOB.getInstance().cambiaTurno();
+            	QuoriPOOB.getInstance().activarAct();
                 actualizarTurno();
             }
         }
@@ -558,23 +559,35 @@ public class QuoriPOOBGUI extends JFrame{
         if(fila % 2 != 0 && columna % 2 != 0) {
         	JOptionPane.showMessageDialog(null,"En este sitio no se puede poner una pared");
         }else if(fila % 2 != 0) {
-        	String tipo = JOptionPane.showInputDialog("Ingrese el tipo de pared que desea poner");
-        	game.putWall(true, fila, columna, tipo);
+        	String tipo = selectTypeOfWall();
+        	QuoriPOOB.getInstance().putWall(true, fila, columna, tipo);
         }else if(columna % 2 != 0) {
-        	String tipo = JOptionPane.showInputDialog("Ingrese el tipo de pared que desea poner");
-        	game.putWall(false, fila, columna, tipo);
+        	String tipo = selectTypeOfWall();
+        	QuoriPOOB.getInstance().putWall(false, fila, columna, tipo);
         }
-
         paintWall();
-        refresh();
-        
+        refresh();   
         actualizarTurno();
     }
+    
+    private String selectTypeOfWall() {
+    	
+		String[] options = {"NormalWall", "TemporalWall", "AllyWall", "LargeWall"};
+	    String tipo = (String) JOptionPane.showInputDialog(
+	    null,
+	    "Seleccione el tipo de barrera que desea colocar:",
+	    "Barreras",
+	    JOptionPane.PLAIN_MESSAGE,
+	    null,
+	    options,
+	    options[0]);
+	    return tipo;     
+	}
     
     
     private void resetGame() throws QuoriPOOBException {
     	
-    	game.reset();
+    	QuoriPOOB.getInstance().reset();
     	repintar();
         paintFichas();
         refresh();
@@ -602,40 +615,45 @@ public class QuoriPOOBGUI extends JFrame{
     }
     
     private void refresh() {
-    	 paredesLabel1.setText("Paredes: " + game.getPlayer1().getNWalls());
-    	 normales1.setText("normales: " + game.getPlayer1().getNormales());
-    	 aliadas1.setText("aliadas: " + game.getPlayer1().getAliadas());
-    	 temporales1.setText("temporales: " + game.getPlayer1().getTemporales());
-    	 largas1.setText("largas: " + game.getPlayer1().getLargas());
+    	 paredesLabel1.setText("Paredes: " + QuoriPOOB.getInstance().getPlayer1().getNWalls());
+    	 normales1.setText("normales: " + QuoriPOOB.getInstance().getPlayer1().getNormales());
+    	 aliadas1.setText("aliadas: " + QuoriPOOB.getInstance().getPlayer1().getAliadas());
+    	 temporales1.setText("temporales: " + QuoriPOOB.getInstance().getPlayer1().getTemporales());
+    	 largas1.setText("largas: " + QuoriPOOB.getInstance().getPlayer1().getLargas());
     	 
-    	 paredesLabel2.setText("Paredes: " + game.getPlayer2().getNWalls());
-    	 normales2.setText("normales: " + game.getPlayer2().getNormales());
-    	 aliadas2.setText("aliadas: " + game.getPlayer2().getAliadas());
-    	 temporales2.setText("temporales: " + game.getPlayer2().getTemporales());
-    	 largas2.setText("largas: " + game.getPlayer2().getLargas());
+    	 paredesLabel2.setText("Paredes: " + QuoriPOOB.getInstance().getPlayer2().getNWalls());
+    	 normales2.setText("normales: " + QuoriPOOB.getInstance().getPlayer2().getNormales());
+    	 aliadas2.setText("aliadas: " + QuoriPOOB.getInstance().getPlayer2().getAliadas());
+    	 temporales2.setText("temporales: " + QuoriPOOB.getInstance().getPlayer2().getTemporales());
+    	 largas2.setText("largas: " + QuoriPOOB.getInstance().getPlayer2().getLargas());
     	 
     }
     
     private void actualizarTurno() {
-        if (game.getCurrentPlayer() == game.getPlayer1()) {
+    	String tipoSeleccionado = (String) tipoDeJuego.getSelectedItem();
+        if (QuoriPOOB.getInstance().getCurrentPlayer() == QuoriPOOB.getInstance().getPlayer1()) {
             jugador1Turno.setText("Es tu turno");
             jugador2Turno.setText("");
-            if (contadorJugador1 != null) {
+            if (tipoSeleccionado.equals("Contrarreloj")) {
             	contadorJugador1.reiniciarContador();
                 contadorJugador1.iniciarContador();
+                contadorJugador2.detenerContador();
             }	
-            if (contadorJugador2 != null) {
-                contadorJugador2.detenerContador(); // Detiene el contador del jugador 2 si estaba corriendo
+            if (tipoSeleccionado.equals("Cronometrado")) {
+            	contadorJugador1.iniciarContador();
+                contadorJugador2.detenerContador();
             }
-        } else if (game.getCurrentPlayer() == game.getPlayer2()) {
+        } else if (QuoriPOOB.getInstance().getCurrentPlayer() == QuoriPOOB.getInstance().getPlayer2()) {
             jugador2Turno.setText("Es tu turno");
             jugador1Turno.setText("");
-            if (contadorJugador2 != null) {
+            if (tipoSeleccionado.equals("Contrarreloj")) {
             	contadorJugador2.reiniciarContador();
                 contadorJugador2.iniciarContador();
-            }
-            if (contadorJugador1 != null) {
-                contadorJugador1.detenerContador(); // Detiene el contador del jugador 1 si estaba corriendo
+                contadorJugador1.detenerContador();
+            }	
+            if (tipoSeleccionado.equals("Cronometrado")) {
+            	contadorJugador2.iniciarContador();
+                contadorJugador1.detenerContador();
             }
         }
     }
@@ -652,9 +670,9 @@ public class QuoriPOOBGUI extends JFrame{
     	String cTeletransportador = JOptionPane.showInputDialog(this, "Ingrese el numero de casillas teletransportadoras: ");
     	String cRegresar = JOptionPane.showInputDialog(this, "Ingrese el numero de casillas regresadoras: ");
     	String cTurnoDoble = JOptionPane.showInputDialog(this, "Ingrese el numero de casillas de turno doble: ");
-    	game = QuoriPOOB.getInstance(player1Color,player2Color,size,temporales,largas,aliadas
+    	QuoriPOOB.getInstance(player1Color,player2Color,size,temporales,largas,aliadas
     			,cTeletransportador,cRegresar,cTurnoDoble);
-    	tablero = game.getTablero();
+    	tablero = QuoriPOOB.getInstance().getTablero();
         prepareElementsBoard(playerName1,playerName2,player1Color,player2Color);
     }
     
@@ -672,9 +690,9 @@ public class QuoriPOOBGUI extends JFrame{
     	String cTeletransportador = JOptionPane.showInputDialog(this, "Ingrese el numero de casillas teletransportadoras: ");
     	String cRegresar = JOptionPane.showInputDialog(this, "Ingrese el numero de casillas regresadoras: ");
     	String cTurnoDoble = JOptionPane.showInputDialog(this, "Ingrese el numero de casillas de turno doble: ");
-    	game = QuoriPOOB.getInstance(player1Color,player2Color,size,temporales,largas,aliadas
+    	QuoriPOOB.getInstance(player1Color,player2Color,size,temporales,largas,aliadas
     			,cTeletransportador,cRegresar,cTurnoDoble);
-    	tablero = game.getTablero();
+    	tablero = QuoriPOOB.getInstance().getTablero();
         prepareElementsBoard(playerName1,playerName2,player1Color,player2Color);
     }
     

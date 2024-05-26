@@ -10,7 +10,7 @@ public class ReturnCell extends Cell {
 	}
 	
 	private QuoriPOOB getInstanceOfGame() throws QuoriPOOBException {
-		return QuoriPOOB.getInstance(null, null, null, null, null, null, null, null, null);
+		return QuoriPOOB.getInstance();
 	}
 	
 	public void act() throws QuoriPOOBException{

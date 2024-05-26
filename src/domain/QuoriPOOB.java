@@ -95,6 +95,10 @@ public class QuoriPOOB  implements Serializable {
         return instanciaUnica;
     }
 	
+	public static QuoriPOOB getInstance() {
+		return instanciaUnica;
+	}
+	
 	
     /**
      * 2 = espacio para la pared, 4 = no se puede poner nada, 0 = casilla normal 
@@ -142,10 +146,10 @@ public class QuoriPOOB  implements Serializable {
     	int mitad = (size -1) / 2;
         Color colorJugador1 = colorTokens.get(1);
         Color colorJugador2 = colorTokens.get(2);
-        t1 = new Token(0, mitad, colorJugador1, this);
+        t1 = new Token(0, mitad, colorJugador1);
         tablero[0][mitad] = 1;
         tokens.put(1, t1);
-        t2 = new Token(size-1, mitad, colorJugador2, this);
+        t2 = new Token(size-1, mitad, colorJugador2);
         tablero[size-1][mitad] = 1;
         tokens.put(2, t2);
     }
@@ -424,6 +428,13 @@ public class QuoriPOOB  implements Serializable {
 		instanciaUnica = null;
 	}
 	
+	
+	
+	public static void setInstanciaUnica(QuoriPOOB instanciaUnica) {
+		QuoriPOOB.instanciaUnica = instanciaUnica;
+	}
+
+
 	private void añadirPared(Wall pared) {
 		if(currentPlayer == player1) {
 			paredesPlayer1.add(pared);
@@ -448,6 +459,24 @@ public class QuoriPOOB  implements Serializable {
 		for(Cell cell : Cells) {
 			if(cell.getFila() == fila && cell.getColumna() == columna) {
 				return cell;
+			}
+		}
+		return null;
+	}
+	
+	public Wall getWallPlayer1(int fila, int columna) {
+		for(Wall wall : paredesPlayer1) {
+			if(wall.getxPos() == fila && wall.getyPos() == columna) {
+				return wall;
+			}
+		}
+		return null;
+	}
+	
+	public Wall getWallPlayer2(int fila, int columna) {
+		for(Wall wall : paredesPlayer2) {
+			if(wall.getxPos() == fila && wall.getyPos() == columna) {
+				return wall;
 			}
 		}
 		return null;
@@ -577,6 +606,9 @@ public class QuoriPOOB  implements Serializable {
             System.out.println();
         }
 	}
+
+
+
 	
 	
 }
