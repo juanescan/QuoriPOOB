@@ -16,6 +16,16 @@ public class Player implements Serializable{
 
 
 	
+	/**
+	 * Constructor for Player
+	 * @param name
+	 * @param token
+	 * @param nWalls
+	 * @param normales
+	 * @param largas
+	 * @param temporales
+	 * @param aliadas
+	 */
 	public Player(String name,Token token, int nWalls, int normales, int largas, int temporales, int aliadas) {
 		this.name = name;
 		this.token = token;

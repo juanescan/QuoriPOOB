@@ -8,11 +8,20 @@ public abstract class Cell implements Serializable{
 	
 	
 	
+	/**
+	 * Cosntructor for the cells
+	 * @param fila
+	 * @param columna
+	 */
 	public Cell(int fila, int columna) {
 		this.fila = fila;
 		this.columna = columna;
 	}
 
+	/**
+	 * abstract method act for the cells
+	 * @throws QuoriPOOBException
+	 */
 	public abstract void act() throws QuoriPOOBException;
 	
 	

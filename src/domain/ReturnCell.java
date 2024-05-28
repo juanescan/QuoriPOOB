@@ -5,17 +5,22 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 public class ReturnCell extends Cell {
+	
+	/**
+	 * Constructor for the return cell
+	 * @param fila
+	 * @param columna
+	 */
 	public ReturnCell(int fila, int columna) {
 		super(fila,columna);
 	}
 	
-	private QuoriPOOB getInstanceOfGame() throws QuoriPOOBException {
-		return QuoriPOOB.getInstance();
-	}
 	
+	/**
+	 * Act for the return cell
+	 */
 	public void act() throws QuoriPOOBException{
-		QuoriPOOB game = getInstanceOfGame();
-		Token t = game.getCurrentPlayer().getToken();
+		Token t = QuoriPOOB.getInstance().getCurrentPlayer().getToken();
 		int xPos = t.getFila();
 		int yPos = t.getColumna();
 		List<int[]> listaPosiciones = t.getPosicionesFicha();
@@ -31,10 +36,10 @@ public class ReturnCell extends Cell {
 			int[] nuevaPosicion = listaPosiciones.get(tamaño-3);
 			int fila = nuevaPosicion[0];
 			int columna = nuevaPosicion[1];
-			game.setElemento(xPos, yPos, 0);
+			QuoriPOOB.getInstance().setElemento(xPos, yPos, 0);
 	        t.setFila(fila);
 	        t.setColumna(columna);
-	        game.setElemento(fila, columna, 1);
+	        QuoriPOOB.getInstance().setElemento(fila, columna, 1);
 			JOptionPane.showMessageDialog(null,"Cayo en una casilla de regresar");
 		}
 	}

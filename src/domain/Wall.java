@@ -9,6 +9,13 @@ public abstract class Wall implements Serializable {
     protected int yPos;
     protected Player player;
 
+    /**
+     * Constructor for the walls
+     * @param horizontal
+     * @param xPos
+     * @param yPos
+     * @param player
+     */
     public Wall(boolean horizontal,int xPos, int yPos, Player player) {
         this.horizontal = horizontal;
         this.xPos = xPos;
@@ -17,9 +24,19 @@ public abstract class Wall implements Serializable {
 
     }
     
+    /**
+     * abstract method put for the walls
+     * @throws QuoriPOOBException
+     */
     public abstract void put() throws QuoriPOOBException;
     
+    /**
+     * abstract method act for the walls
+     * @throws QuoriPOOBException
+     */
     public abstract void act() throws QuoriPOOBException;
+    
+    public abstract boolean canPass();
 
 	public boolean getHorizontal() {
 		return horizontal;
@@ -29,10 +46,12 @@ public abstract class Wall implements Serializable {
 		return xPos;
 	}
 
-
-
 	public int getyPos() {
 		return yPos;
+	}
+
+	public Player getPlayer() {
+		return player;
 	}
 
 	

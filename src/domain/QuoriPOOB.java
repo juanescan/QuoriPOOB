@@ -17,9 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.JOptionPane;
-/**
- * prueba
- */
+
 /**
  * 
  */
@@ -35,7 +33,6 @@ public class QuoriPOOB  implements Serializable {
     private Token t1;
     private Token t2;
     private List<Cell> Cells;
-	private Object gameMode;
 	private int nWalls;
 	private int normales;
 	private int temporales;
@@ -48,6 +45,7 @@ public class QuoriPOOB  implements Serializable {
 	private List<int[]> posicionesCasillas;
 	private List<Wall> paredesPlayer1;
 	private List<Wall> paredesPlayer2;
+	private boolean esMaquina;
 
 
 
@@ -57,8 +55,23 @@ public class QuoriPOOB  implements Serializable {
  * Constructor
  * @throws QuoriPOOBException 
  */
+	/**
+	 * Contructor for the main class QuoriPOOB
+	 * @param player1Color
+	 * @param player2Color
+	 * @param size
+	 * @param temporales
+	 * @param largas
+	 * @param aliadas
+	 * @param cTeletransportador
+	 * @param cRegresar
+	 * @param cTurnoDoble
+	 * @param esMaquina
+	 * @throws QuoriPOOBException
+	 */
 	private QuoriPOOB(Color player1Color , Color player2Color, String size, String temporales, 
-			String largas, String aliadas, String cTeletransportador, String cRegresar, String cTurnoDoble)
+			String largas, String aliadas, String cTeletransportador, String cRegresar, String cTurnoDoble,
+			boolean esMaquina)
 					throws QuoriPOOBException{
 		
 		intSize(size);
@@ -77,31 +90,53 @@ public class QuoriPOOB  implements Serializable {
         colorTokens = new HashMap<>();
         colorTokens.put(1, player1Color);
         colorTokens.put(2, player2Color);
+        this.esMaquina = esMaquina;
         inicializarTablero();
         inicializarCasillas();
         inicializarFichas();
-        inicializarJugadores();
-        imprimir();
-
+        if(esMaquina) {
+        	inicializarJugadoresMaquinaPrincipiante();
+        }else {
+        	 inicializarJugadores();
+        }
     }
 	
     
-	public static synchronized QuoriPOOB getInstance(Color player1Color , Color player2Color, String size, String temporales, 
-			String largas, String aliadas, String cTeletransportador, String cRegresar, String cTurnoDoble) throws QuoriPOOBException {
+	/**
+	 * Create a instance of the class if the instance is null and if not return the instance
+	 * @param player1Color
+	 * @param player2Color
+	 * @param size
+	 * @param temporales
+	 * @param largas
+	 * @param aliadas
+	 * @param cTeletransportador
+	 * @param cRegresar
+	 * @param cTurnoDoble
+	 * @param esMaquina
+	 * @return
+	 * @throws QuoriPOOBException
+	 */
+	public static synchronized QuoriPOOB getInstance(Color player1Color , Color player2Color, String size, 
+			String temporales, String largas, String aliadas, String cTeletransportador, String cRegresar, 
+			String cTurnoDoble,boolean esMaquina) throws QuoriPOOBException {
         if (instanciaUnica == null) {
             instanciaUnica = new QuoriPOOB(player1Color,player2Color,size,temporales,largas,aliadas
-        			,cTeletransportador,cRegresar,cTurnoDoble);
+        			,cTeletransportador,cRegresar,cTurnoDoble,esMaquina);
         }
         return instanciaUnica;
     }
 	
+	/**
+	 * @return the instance of singleton
+	 */
 	public static QuoriPOOB getInstance() {
 		return instanciaUnica;
 	}
 	
 	
     /**
-     * 2 = espacio para la pared, 4 = no se puede poner nada, 0 = casilla normal 
+     * Inicialate the Board in the logic for the game
      */
     private void inicializarTablero(){
         for (int i = 0; i < tablero.length; i++){
@@ -118,7 +153,7 @@ public class QuoriPOOB  implements Serializable {
     }
     
     /**
-     * inicializa las casillas del juego
+     * Inicialate the Cells for the game
      */
     private void inicializarCasillas() {
     	int nFilas = tablero.length;
@@ -140,7 +175,7 @@ public class QuoriPOOB  implements Serializable {
     	asignarCNormales(posicionesCasillas);
     }
     /**
-     * inicializa las fichas del juego
+     * Inicialate the tokens for the game
      */
     private void inicializarFichas() {
     	int mitad = (size -1) / 2;
@@ -157,16 +192,22 @@ public class QuoriPOOB  implements Serializable {
     
 
     /**
-     * inicializa los jugadores del juego
+     * Inicialate the players for the game
      */
 	private void inicializarJugadores() {
     	player1 = new Player("Jugador 1",t1, nWalls, normales, largas, temporales, aliadas);
     	player2 = new Player("Jugador 2",t2, nWalls, normales, largas, temporales, aliadas);
     	currentPlayer = player1;
-    	}
+    }
+	
+	private void inicializarJugadoresMaquinaPrincipiante() {
+		player1 = new Player("Jugador 1",t1, nWalls, normales, largas, temporales, aliadas);
+		player2 = new principianteMachine("Jugador 2",t2, nWalls, normales, largas, temporales, aliadas);
+    	currentPlayer = player1;
+	}
     
     /**
-     * cambia el turno cuando se realiza una accion
+     * Change the turn when the players realize an action
      */
     public void cambiaTurno() {
     	if(currentPlayer == player1) {
@@ -175,8 +216,11 @@ public class QuoriPOOB  implements Serializable {
     		currentPlayer = player1;
     	}
     }
+    
+    
     /**
-     * verifica quien gana el juego
+     * verify is someone won the game
+     * @return boolean
      */
     public boolean verificarVictoria() {
         Token t = currentPlayer.getToken();
@@ -184,8 +228,13 @@ public class QuoriPOOB  implements Serializable {
         return (currentPlayer == player1 && fila == size-1) || (currentPlayer == player2 && fila == 0);
     }
     
+   
     /**
-     * mueve las fichas dependiendo de quien es el turno
+     * Do the move of the token if is possible and activate the method act for the cells
+     * @param xPos
+     * @param yPos
+     * @return boolean
+     * @throws QuoriPOOBException
      */
     public boolean move(int xPos, int yPos) throws QuoriPOOBException {
     	Token t = getCurrentPlayer().getToken();
@@ -194,27 +243,41 @@ public class QuoriPOOB  implements Serializable {
     		Cell c = getCell(xPos,yPos);
     		c.act();
     	}
-    	imprimir();
     	return movHecho;
-    	
     } 	
     
+    /**
+     * set in the matrix the in a specific position the value that represents a object
+     * @param fila
+     * @param columna
+     * @param valor
+     */
     public void setElemento(int fila, int columna, int valor){
         tablero[fila][columna] = valor;
     }
+    
+  
     /**
-     * coloca una barrera en una posicion deseada
+     * Create and put a wall in the board
+     * @param horizontal
+     * @param xPos
+     * @param yPos
+     * @param tipo
      */
     public void putWall(boolean horizontal,int xPos, int yPos, String tipo) {
     	if(currentPlayer.getNWalls() > 0) {
     		try {
     			Class<?> wallClass = Class.forName("domain." + tipo);
                 Constructor<?> constructor = wallClass.getConstructor(boolean.class, int.class, int.class, Player.class);
-                Wall wallInstance = (Wall) constructor.newInstance(horizontal, xPos, yPos, currentPlayer);
+                Wall wallInstance = (Wall) constructor.newInstance(horizontal, xPos, yPos, currentPlayer);              
                 wallInstance.put();
-                añadirPared(wallInstance);
-                imprimir();
+                if(currentPlayer == player1) {
+                	paredesPlayer1.add(wallInstance);
+                }else {
+                	paredesPlayer2.add(wallInstance);
+                }
             } catch (Exception e) {
+            	Log.record(e);
                 e.printStackTrace();
             }
     	}else {
@@ -222,23 +285,32 @@ public class QuoriPOOB  implements Serializable {
     	}
     }
     
+    
     /**
-     * guarda la partida
+     * Save the state of the game
+     * @param archivo
      */
     public void save(File archivo) {
     	 try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(archivo))) {
              outputStream.writeObject(this); 
          } catch (IOException e) {
+        	 Log.record(e);
              e.printStackTrace();
          }
     }
 
-    // Método para abrir un objeto QuoriPOOB desde un archivo
+    
+    /**
+     * Open a file 
+     * @param archivo
+     * @return a QuoriPOOB state
+     */
     public static QuoriPOOB open(File archivo) {
     	QuoriPOOB quoriPOOB = null;
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(archivo))) {
             quoriPOOB = (QuoriPOOB) inputStream.readObject(); 
         } catch (IOException | ClassNotFoundException e) {
+        	Log.record(e);
             e.printStackTrace();
         }
         return quoriPOOB;
@@ -259,6 +331,12 @@ public class QuoriPOOB  implements Serializable {
 		return tokens;
 	}
 	
+	/**
+	 * Return a token in a specific position
+	 * @param fila
+	 * @param columna
+	 * @return Token
+	 */
 	public Token getToken(int fila, int columna) {
 	    for (Token token : tokens.values()) {
 	        if (token.getFila() == fila && token.getColumna() == columna) {
@@ -270,6 +348,11 @@ public class QuoriPOOB  implements Serializable {
 	
 
 	
+	/**
+	 * Convert the String size into a int
+	 * @param size
+	 * @throws QuoriPOOBException
+	 */
 	private void intSize(String size) throws QuoriPOOBException {
 		try {
 			int tempSize = Integer.parseInt(size);
@@ -280,65 +363,99 @@ public class QuoriPOOB  implements Serializable {
 			}
 			this.size = (tempSize * 2) -1;
 		}catch(NumberFormatException e) {
+			Log.record(e);
 			String n =JOptionPane.showInputDialog(this, "Reingrese el tamaño del tablero");
 			intSize(n);
 		}
 	}
 	
+	/**
+	 * Convert String temporales into int
+	 * @param temporales
+	 */
 	private void intTemporales(String temporales) {
 		try {
 			this.temporales = Integer.parseInt(temporales);
 		}catch(NumberFormatException e) {
+			Log.record(e);
 			String n =JOptionPane.showInputDialog(this, "Reingrese el numero de paredes temporales");
 			intTemporales(n);
 		}
 	}
 	
+	/**
+	 * Convert String largas into int
+	 * @param largas
+	 */
 	private void intLargas(String largas) {
 		try {
 			this.largas = Integer.parseInt(largas);
 		}catch(NumberFormatException e) {
+			Log.record(e);
 			String n =JOptionPane.showInputDialog(this, "Reingrese el numero de paredes largas");
 			intLargas(n);
 		}
 	}
 	
+	/**
+	 * Convert String aliadas into int
+	 * @param aliadas
+	 */
 	private void intAliadas(String aliadas) {
 		try {
 			this.aliadas = Integer.parseInt(aliadas);
 		}catch(NumberFormatException e) {
+			Log.record(e);
 			String n =JOptionPane.showInputDialog(this, "Reingrese el numero de paredes aliadas");
 			intAliadas(n);
 		}
 	}
 	
+	/**
+	 * Convert String cTeletransportador into int
+	 * @param cTeletransportador
+	 */
 	private void intCTeletransportador(String cTeletransportador) {
 		try {
 			this.cTeletransportador = Integer.parseInt(cTeletransportador);
 		}catch(NumberFormatException e) {
+			Log.record(e);
 			String n =JOptionPane.showInputDialog(this, "Reingrese el numero de casillas teletransportadoras");
 			intCTeletransportador(n);
 		}
 	}
 	
+	/**
+	 * Convert String cRegresar into int
+	 * @param cRegresar
+	 */
 	private void intCRegresar(String cRegresar) {
 		try {
 			this.cRegresar = Integer.parseInt(cRegresar);
 		}catch(NumberFormatException e) {
+			Log.record(e);
 			String n =JOptionPane.showInputDialog(this, "Reingrese el numero de casillas teletransportadoras");
 			intCRegresar(n);
 		}
 	}
 	
+	/**
+	 * Convert String cTurnoDoble into int
+	 * @param cTurnoDoble
+	 */
 	private void intCTurnoDoble(String cTurnoDoble) {
 		try {
 			this.cTurnoDoble = Integer.parseInt(cTurnoDoble);
 		}catch(NumberFormatException e) {
+			Log.record(e);
 			String n =JOptionPane.showInputDialog(this, "Reingrese el numero de casillas teletransportadoras");
 			intCTurnoDoble(n);
 		}
 	}
 	
+	/**
+	 * checks if the number of walls entered by the user is correct
+	 */
 	private void checkNumeroParedes() {
 	    int n = (size + 1) / 2;
 	    int paredes = temporales + largas + aliadas;
@@ -350,6 +467,7 @@ public class QuoriPOOB  implements Serializable {
 	        	nWalls = n;
 	        }
 	    } catch (QuoriPOOBException e) {
+	    	Log.record(e);
 	        String temporales = JOptionPane.showInputDialog(null, "Reingrese el numero de paredes temporales: ");
 	        String largas = JOptionPane.showInputDialog(null, "Reingrese el numero de paredes largas: ");
 	        String aliadas = JOptionPane.showInputDialog(null, "Reingrese el numero de paredes aliadas: ");
@@ -360,10 +478,9 @@ public class QuoriPOOB  implements Serializable {
 	    }
 	}
 
-	
-	
 	/**
-	 * 5 = casilla de doble turno
+	 * assign an empty position to a double turn cells
+	 * @param posicionesCasillas
 	 */
 	private void asignarDobleTurno(List<int[]> posicionesCasillas) {
 		for (int i = 0; i < cTurnoDoble; i++) {
@@ -376,8 +493,11 @@ public class QuoriPOOB  implements Serializable {
 	        }
 	    }
 	}
+
+	
 	/**
-	 * casilla para regresar
+	 * assign an empty position to a return cells
+	 * @param posicionesCasillas
 	 */
 	private void asignarCRegresar(List<int[]> posicionesCasillas) {
 		for (int i = 0; i < cRegresar; i++) {
@@ -391,6 +511,10 @@ public class QuoriPOOB  implements Serializable {
 	    }
 	}
 	
+	/**
+	 * assign an empty position to a teletransportator cells
+	 * @param posicionesCasillas
+	 */
 	private void asignarCTeletransportar(List<int[]> posicionesCasillas) {
 		for (int i = 0; i < cTeletransportador; i++) {
 	        if (i < posicionesCasillas.size()) {
@@ -403,8 +527,10 @@ public class QuoriPOOB  implements Serializable {
 	    }
 	}
 	
+
 	/**
-	 * casillas normales
+	 * assign an empty position to a normal Cells
+	 * @param posicionesCasillas
 	 */
 	private void asignarCNormales(List<int[]> posicionesCasillas) {
 		while (!posicionesCasillas.isEmpty()) {
@@ -414,14 +540,24 @@ public class QuoriPOOB  implements Serializable {
 	        tablero[pos[0]][pos[1]] = 0; 
 	    }
 	}
+	
 	/**
-	 * reinicia el tablero, casillas, fichas y jugadores
+	 * Reset the table to the initial state
 	 */
 	public void reset() {
 		inicializarTablero();
         inicializarCasillas();
         inicializarFichas();
-        inicializarJugadores();
+        if(esMaquina) {
+        	inicializarJugadoresMaquinaPrincipiante();
+        }else {
+            inicializarJugadores();
+        }
+        resetTurno();
+	}
+	
+	private void resetTurno() {
+		currentPlayer = player1;
 	}
 	
 	public static void resetInstance() {
@@ -435,14 +571,12 @@ public class QuoriPOOB  implements Serializable {
 	}
 
 
-	private void añadirPared(Wall pared) {
-		if(currentPlayer == player1) {
-			paredesPlayer1.add(pared);
-		}else if (currentPlayer == player2) {
-			paredesPlayer2.add(pared);
-		}
-	}
 	
+	
+	/**
+	 * Activate the action of every cell 
+	 * @throws QuoriPOOBException
+	 */
 	public void activarAct() throws QuoriPOOBException {
 		for(Wall w: paredesPlayer1) {
 			w.act();
@@ -452,8 +586,12 @@ public class QuoriPOOB  implements Serializable {
 		}
 	}
 	
+	
 	/**
-	 * obtiene una casilla dada una fila y una columna
+	 * Get a cell in a specific position
+	 * @param fila
+	 * @param columna
+	 * @return Cell
 	 */
 	public Cell getCell(int fila, int columna) {
 		for(Cell cell : Cells) {
@@ -464,6 +602,12 @@ public class QuoriPOOB  implements Serializable {
 		return null;
 	}
 	
+	/**
+	 * Get the wall of player 1 in a specific position
+	 * @param fila
+	 * @param columna
+	 * @return Wall
+	 */
 	public Wall getWallPlayer1(int fila, int columna) {
 		for(Wall wall : paredesPlayer1) {
 			if(wall.getxPos() == fila && wall.getyPos() == columna) {
@@ -473,6 +617,12 @@ public class QuoriPOOB  implements Serializable {
 		return null;
 	}
 	
+	/*
+	 * Get the wall of player 2 in a specific position
+	 * @param fila
+	 * @param columna
+	 * @return Wall
+	 */
 	public Wall getWallPlayer2(int fila, int columna) {
 		for(Wall wall : paredesPlayer2) {
 			if(wall.getxPos() == fila && wall.getyPos() == columna) {
@@ -607,6 +757,7 @@ public class QuoriPOOB  implements Serializable {
         }
 	}
 
+	
 
 
 	

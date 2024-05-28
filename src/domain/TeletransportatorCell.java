@@ -4,16 +4,19 @@ import javax.swing.JOptionPane;
 
 public class TeletransportatorCell extends Cell{
 	
+	/**
+	 * Constructor for the teletransportator cell
+	 * @param fila
+	 * @param columna
+	 */
 	public TeletransportatorCell(int fila, int columna) {
 		super(fila,columna);
 	}
 	
-	private QuoriPOOB getInstanceOfGame() throws QuoriPOOBException {
-		return QuoriPOOB.getInstance();
-	}
-	
+	/**
+	 * Act for the teletransportator cell
+	 */
 	public void act() throws QuoriPOOBException{
-		QuoriPOOB game = getInstanceOfGame();
 		JOptionPane.showMessageDialog(null,"Cayo en una casilla de teletransportar");
 		 String[] options = {"↖", "↑", "↗", "←", "→", "↙", "↓", "↘"};
 	     String tipo = (String) JOptionPane.showInputDialog(
@@ -28,6 +31,11 @@ public class TeletransportatorCell extends Cell{
 	     
 	}
 	
+	/**
+	 * Options for the teletransportator
+	 * @param tipo
+	 * @throws QuoriPOOBException
+	 */
 	private void opciones(String tipo) throws QuoriPOOBException {
 		if (tipo != null) {
 	        switch (tipo) {
@@ -61,15 +69,18 @@ public class TeletransportatorCell extends Cell{
 	    }
 	}
 	
+	/**
+	 * move up in the teleportation
+	 * @throws QuoriPOOBException
+	 */
 	private void  moveArriba() throws QuoriPOOBException {
-		QuoriPOOB game = getInstanceOfGame();
-		Token t = game.getCurrentPlayer().getToken();
+		Token t = QuoriPOOB.getInstance().getCurrentPlayer().getToken();
 		int fila = t.getFila();
 		int columna = t.getColumna();
 		if(fila != 0) {
-			game.setElemento(fila, columna, 0);
+			QuoriPOOB.getInstance().setElemento(fila, columna, 0);
 	        fila = fila -2;
-	        game.setElemento(fila, columna, 1);
+	        QuoriPOOB.getInstance().setElemento(fila, columna, 1);
 	        t.setFila(fila);
 	        t.setColumna(columna);
 		}else {
@@ -79,16 +90,19 @@ public class TeletransportatorCell extends Cell{
 		
 	}
 	
+	/**
+	 * move down in the teleportation
+	 * @throws QuoriPOOBException
+	 */
 	private void  moveAbajo() throws QuoriPOOBException {
-		QuoriPOOB game = getInstanceOfGame();
-		Token t = game.getCurrentPlayer().getToken();
-		int size = game.getSize();
+		Token t = QuoriPOOB.getInstance().getCurrentPlayer().getToken();
+		int size = QuoriPOOB.getInstance().getSize();
 		int fila = t.getFila();
 		int columna = t.getColumna();
 		if(fila != size -1 ) {
-			game.setElemento(fila, columna, 0);
+			QuoriPOOB.getInstance().setElemento(fila, columna, 0);
 	        fila = fila + 2;
-	        game.setElemento(fila, columna, 1);
+	        QuoriPOOB.getInstance().setElemento(fila, columna, 1);
 	        t.setFila(fila);
 	        t.setColumna(columna);
 		}else {
@@ -98,16 +112,19 @@ public class TeletransportatorCell extends Cell{
 		
 	}
 	
+	/**
+	 * move right in the teleportation
+	 * @throws QuoriPOOBException
+	 */
 	private void  moveDer() throws QuoriPOOBException {
-		QuoriPOOB game = getInstanceOfGame();
-		Token t = game.getCurrentPlayer().getToken();
+		Token t = QuoriPOOB.getInstance().getCurrentPlayer().getToken();
 		int fila = t.getFila();
 		int columna = t.getColumna();
-		int size = game.getSize();
+		int size = QuoriPOOB.getInstance().getSize();
 		if(columna != size -1) {
-			game.setElemento(fila, columna, 0);
+			QuoriPOOB.getInstance().setElemento(fila, columna, 0);
 	        columna = columna +2;
-	        game.setElemento(fila, columna, 1);
+	        QuoriPOOB.getInstance().setElemento(fila, columna, 1);
 	        t.setFila(fila);
 	        t.setColumna(columna);
 		}else {
@@ -116,15 +133,18 @@ public class TeletransportatorCell extends Cell{
 		}
 	}
 	
+	/**
+	 * move left in the teleportation
+	 * @throws QuoriPOOBException
+	 */
 	private void  moveIzq() throws QuoriPOOBException {
-		QuoriPOOB game = getInstanceOfGame();
-		Token t = game.getCurrentPlayer().getToken();
+		Token t = QuoriPOOB.getInstance().getCurrentPlayer().getToken();
 		int fila = t.getFila();
 		int columna = t.getColumna();
 		if(columna != 0) {
-			game.setElemento(fila, columna, 0);
+			QuoriPOOB.getInstance().setElemento(fila, columna, 0);
 	        columna = columna - 2;
-	        game.setElemento(fila, columna, 1);
+	        QuoriPOOB.getInstance().setElemento(fila, columna, 1);
 	        t.setFila(fila);
 	        t.setColumna(columna);
 		}else {
@@ -133,17 +153,20 @@ public class TeletransportatorCell extends Cell{
 		}	
 	}
 	
+	/**
+	 * move diagonally up right in the teleportation
+	 * @throws QuoriPOOBException
+	 */
 	private void  moveDiaArrDer() throws QuoriPOOBException {
-		QuoriPOOB game = getInstanceOfGame();
-		Token t = game.getCurrentPlayer().getToken();
+		Token t = QuoriPOOB.getInstance().getCurrentPlayer().getToken();
 		int fila = t.getFila();
 		int columna = t.getColumna();
-		int size = game.getSize();
+		int size = QuoriPOOB.getInstance().getSize();
 		if(fila != 0 && columna != size -1) {
-			game.setElemento(fila, columna, 0);
+			QuoriPOOB.getInstance().setElemento(fila, columna, 0);
 	        fila = fila -2;
 	        columna = columna +2;
-	        game.setElemento(fila, columna, 1);
+	        QuoriPOOB.getInstance().setElemento(fila, columna, 1);
 	        t.setFila(fila);
 	        t.setColumna(columna);
 		}else {
@@ -152,16 +175,19 @@ public class TeletransportatorCell extends Cell{
 		}
 	}
 	
+	/**
+	 * move diagonally up left in the teleportation
+	 * @throws QuoriPOOBException
+	 */
 	private void  moveDiaArrIzq() throws QuoriPOOBException {
-		QuoriPOOB game = getInstanceOfGame();
-		Token t = game.getCurrentPlayer().getToken();
+		Token t = QuoriPOOB.getInstance().getCurrentPlayer().getToken();
 		int fila = t.getFila();
 		int columna = t.getColumna();
 		if(fila != 0 && columna != 0) {
-			game.setElemento(fila, columna, 0);
+			QuoriPOOB.getInstance().setElemento(fila, columna, 0);
 	        fila = fila -2;
 	        columna = columna -2;
-	        game.setElemento(fila, columna, 1);
+	        QuoriPOOB.getInstance().setElemento(fila, columna, 1);
 	        t.setFila(fila);
 	        t.setColumna(columna);
 		}else {
@@ -171,17 +197,20 @@ public class TeletransportatorCell extends Cell{
 		
 	}
 	
+	/**
+	 * move diagonally down right in the teleportation
+	 * @throws QuoriPOOBException
+	 */
 	private void  moveDiaAbaDer() throws QuoriPOOBException {
-		QuoriPOOB game = getInstanceOfGame();
-		Token t = game.getCurrentPlayer().getToken();
+		Token t = QuoriPOOB.getInstance().getCurrentPlayer().getToken();
 		int fila = t.getFila();
 		int columna = t.getColumna();
-		int size = game.getSize();
+		int size = QuoriPOOB.getInstance().getSize();
 		if(fila != size -1 && columna != size -1 ) {
-			game.setElemento(fila, columna, 0);
+			QuoriPOOB.getInstance().setElemento(fila, columna, 0);
 	        fila = fila +2;
 	        columna = columna +2;
-	        game.setElemento(fila, columna, 1);
+	        QuoriPOOB.getInstance().setElemento(fila, columna, 1);
 	        t.setFila(fila);
 	        t.setColumna(columna);
 		}else {
@@ -190,17 +219,20 @@ public class TeletransportatorCell extends Cell{
 		}	
 	}
 	
+	/**
+	 * move diagonally down left in the teleportation
+	 * @throws QuoriPOOBException
+	 */
 	private void  moveDiaAbaIzq() throws QuoriPOOBException {
-		QuoriPOOB game = getInstanceOfGame();
-		Token t = game.getCurrentPlayer().getToken();
+		Token t = QuoriPOOB.getInstance().getCurrentPlayer().getToken();
 		int fila = t.getFila();
 		int columna = t.getColumna();
-		int size = game.getSize();
+		int size = QuoriPOOB.getInstance().getSize();
 		if(fila != size -1 && columna != 0) {
-			game.setElemento(fila, columna, 0);
+			QuoriPOOB.getInstance().setElemento(fila, columna, 0);
 	        fila = fila +2;
 	        columna = columna -2;
-	        game.setElemento(fila, columna, 1);
+	        QuoriPOOB.getInstance().setElemento(fila, columna, 1);
 	        t.setFila(fila);
 	        t.setColumna(columna);
 		}else {

@@ -16,6 +16,12 @@ public class Contador extends JPanel {
     private QuoriPOOBGUI pantalla;
 
     
+    /**
+     * Create a countdown
+     * @param tiempoInicial
+     * @param tipoJuego
+     * @param pantalla
+     */
     public Contador(int tiempoInicial,String tipoJuego,QuoriPOOBGUI pantalla) {
         this.tiempoInicial = tiempoInicial;
         this.tipoJuego = tipoJuego;
@@ -24,6 +30,9 @@ public class Contador extends JPanel {
         reiniciarContador(); // Método para iniciar el contador con el tiempo inicial
     }
 
+    /**
+     *  Start the timer
+     */
     private void iniciarTimer() {
         timer = new Timer(1000, new ActionListener() {
             @Override
@@ -34,22 +43,35 @@ public class Contador extends JPanel {
         timer.start();
     }
     
+    
+    /**
+     * Start the countdown
+     */
     public void iniciarContador() {
-        if (!timer.isRunning()) { // Verifica si el temporizador no está en funcionamiento para evitar iniciar múltiples temporizadores
+        if (!timer.isRunning()) { 
             timer.start();
         }
     }
     
+    /**
+     * Stop the countdown
+     */
     public void detenerContador() {
-        timer.stop(); // Detiene el temporizador
+        timer.stop(); 
     }
 
+    /**
+     * Stop the timer
+     */
     private void detenerTimer() {
         if (timer != null && timer.isRunning()) {
             timer.stop();
         }
     }
 
+    /**
+     * Reiniciate the countdown
+     */
     public void reiniciarContador() {
         tiempoRestante = tiempoInicial;
         if (timer != null) {
@@ -60,6 +82,9 @@ public class Contador extends JPanel {
     }
 
 
+    /**
+     * Update the timer every second and manage what happen the time remaining is zero
+     */
     private void actualizarTiempo() {
         tiempoRestante--;
         if (tiempoRestante <= 0) {
@@ -86,10 +111,7 @@ public class Contador extends JPanel {
                         pantalla.actionInitialScreen();
                     }
                 }
-                
-                
             }
-
             QuoriPOOB.getInstance().cambiaTurno();
         }
         actualizarLabel();
@@ -99,6 +121,9 @@ public class Contador extends JPanel {
         return tiempoRestante;
     }
 
+    /**
+     * Update the label
+     */
     private void actualizarLabel() {
         labelTiempo = new JLabel(tiempoRestante + " segundos");
         removeAll(); // Elimina cualquier componente anterior
